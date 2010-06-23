@@ -32,6 +32,8 @@ To use, install the package, and use the field::
     class MyModel(models.Model):
         the_timedelta = timedelta.TimedeltaField()
 
+There are also some useful methods in helpers.py to work with timedelta
+objects.
 
 Todo
 -------------

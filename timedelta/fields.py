@@ -4,7 +4,7 @@ import datetime
 from collections import defaultdict
 import re
 
-from models import nice_repr, parse
+from helpers import nice_repr, parse
 from forms import TimedeltaFormField
 
 SECS_PER_DAY = 60*60*24

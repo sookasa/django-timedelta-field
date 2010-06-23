@@ -5,7 +5,7 @@ import datetime
 from collections import defaultdict
 
 from widgets import TimedeltaWidget
-from models import parse
+from helpers import parse
 
 class TimedeltaFormField(forms.Field):
     default_error_messages = {
@@ -18,7 +18,6 @@ class TimedeltaFormField(forms.Field):
         super(TimedeltaFormField, self).__init__(*args, **defaults)
         
     def clean(self, value):
-        # import pdb; pdb.set_trace()
         super(TimedeltaFormField, self).clean(value)
         if value == '' and not self.required:
             return u''
@@ -26,17 +25,6 @@ class TimedeltaFormField(forms.Field):
         data = defaultdict(float)
         try:
             return parse(value)
-            for part in value.split(','):
-                value, which = part.strip().split(' ')
-                if not which.endswith('s'):
-                    which += "s"
-                if which == "wks":
-                    which = "weeks"
-                if which == "mins":
-                    which = "minutes"
-                if which == "secs":
-                    which = "seconds"
-                data[which] = float(value)
         except TypeError:
             raise forms.ValidationError(self.error_messages['invalid'])
             

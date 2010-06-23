@@ -1,7 +1,7 @@
 from django import forms
 import datetime
 
-from models import nice_repr, parse
+from helpers import nice_repr, parse
 
 class TimedeltaWidget(forms.TextInput):
     def __init__(self, *args, **kwargs):
@@ -20,9 +20,8 @@ class TimedeltaWidget(forms.TextInput):
     
     def _has_changed(self, initial, data):
         """
-        We need to make sure the objects are of the canonical form.
-        
-        
+        We need to make sure the objects are of the canonical form, as a
+        string comparison may needlessly fail.
         """
         if not isinstance(initial, datetime.timedelta):
             initial = parse(initial)
