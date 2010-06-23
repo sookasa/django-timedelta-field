@@ -1,0 +1,40 @@
+django-timedelta-field
+==========================
+
+PostgreSQL can store data as INTERVAL type, which is close to meaning the
+same as python's timedelta object (although better in a couple of ways).
+
+I have lots of use for timedelta objects, and having code that basically
+wrapped integer objects as a number of seconds was common. This module
+combines the two:
+
+    * a timedelta.TimedeltaField() object that transparently converts
+      to and from datetime.timedelta
+    
+    * storage of the data as an INTERVAL in PostgreSQL, or a string in
+      other databases. (Other databases will be considered if I ever
+      use them, or receive patches).
+
+The coolest part of this package is the way it manipulates strings entered
+by users, and presents them. Any string of the format:
+
+    [X weeks,] [Y days,] [Z hours,] [A minutes,] [B seconds]
+
+will be converted to a timedelta object. Even shortened versions can be used:
+hrs, hr or h will also suffice.  The parsing ignores trailing 's', but is
+smart about adding them in when presenting the data to the user.
+
+To use, install the package, and use the field::
+
+    from django.db import models
+    import timedelta
+    
+    class MyModel(models.Model):
+        the_timedelta = timedelta.TimedeltaField()
+
+
+Todo
+-------------
+
+Handle strings with times in other languages. I'm not really sure about how
+to do this, but it may be useful.
