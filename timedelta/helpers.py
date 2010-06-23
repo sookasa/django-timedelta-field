@@ -59,10 +59,10 @@ def parse(string):
                      r'((?P<hours>\d+)\W*h(ou)?r(s)?(,)?\W*)?'
                      r'((?P<minutes>\d+)\W*m(in(ute)?)?(s)?(,)?\W*)?'
                      r'((?P<seconds>\d+)\W*s(ec(ond)?(s)?)?)?\W*$',
-                     str(string)).groupdict()
-    
-    if not d:
-        raise ValueError("%s is not a valid time interval" % string)
+                     str(string))
+        if not d:
+            raise TypeError("%s is not a valid time interval" % string)
+        d = d.groupdict()
     
     return datetime.timedelta(**dict(( (k, int(v)) for k,v in d.items() 
         if v is not None )))
