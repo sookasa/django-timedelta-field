@@ -2,6 +2,7 @@ from unittest import TestCase
 import datetime
 from forms import TimedeltaFormField
 from widgets import TimedeltaWidget
+from helpers import *
 
 class TimedeltaWidgetTest(TestCase):
     def test_render(self):
@@ -78,3 +79,117 @@ class TimedeltaFormFieldTest(TestCase):
         >>> t.clean('2 weeks, 2 days')
         datetime.timedelta(16)
         """
+
+class TimedeltaHelpersTest(TestCase):
+    def test_parse(self):
+        """
+        >>> parse('1 day')
+        datetime.timedelta(1)
+        >>> parse('2 days')
+        datetime.timedelta(2)
+        >>> parse("1.5 days")
+        datetime.timedelta(1, 43200)
+        >>> parse("3 weeks")
+        datetime.timedelta(21)
+        >>> parse("4.2 hours")
+        datetime.timedelta(0, 15120)
+        >>> parse(".5 hours")
+        datetime.timedelta(0, 1800)
+        >>> parse(" hours")
+        Traceback (most recent call last):
+            ...
+        TypeError: ' hours' is not a valid time interval
+        >>> parse("1 hour, 5 mins")
+        datetime.timedelta(0, 3900)
+        """
+    
+    def test_multiply(self):
+        """
+        >>> multiply(datetime.timedelta(1), 2.5)
+        datetime.timedelta(2, 43200)
+        >>> multiply(datetime.timedelta(1), 3)
+        datetime.timedelta(3)
+        >>> multiply(datetime.timedelta(1), Decimal("5.5"))
+        datetime.timedelta(5, 43200)
+        >>> multiply(datetime.date.today(), 2.5)
+        Traceback (most recent call last):
+            ...
+        AssertionError: First argument must be a timedelta.
+        >>> multiply(datetime.timedelta(1), "2")
+        Traceback (most recent call last):
+            ...
+        AssertionError: Second argument must be a number.
+        """
+    def test_divide(self):
+        """
+        >>> divide(datetime.timedelta(1), datetime.timedelta(hours=6))
+        4
+        >>> divide(datetime.timedelta(2), datetime.timedelta(3))
+        0
+        >>> divide(datetime.timedelta(8), datetime.timedelta(3), float=True)
+        2.6666666666666665
+        >>> divide(datetime.timedelta(8), 2.0)
+        datetime.timedelta(4)
+        >>> divide(datetime.timedelta(8), 2, float=True)
+        Traceback (most recent call last):
+            ...
+        AssertionError: float=True is inappropriate when dividing timedelta by a number.
+        """
+    
+    def percentage(self):
+        """
+        >>> percentage(datetime.timedelta(4), datetime.timedelta(2))
+        200.0
+        >>> percentage(datetime.timedelta(2), datetime.timedelta(4))
+        50.0
+        
+        """
+    
+    def test_round_to_nearest(self):
+        """
+        >>> td = datetime.timedelta(minutes=30)
+        >>> round_to_nearest(datetime.timedelta(minutes=0), td)
+        datetime.timedelta(0)
+        >>> round_to_nearest(datetime.timedelta(minutes=14), td)
+        datetime.timedelta(0)
+        >>> round_to_nearest(datetime.timedelta(minutes=15), td)
+        datetime.timedelta(0, 1800)
+        >>> round_to_nearest(datetime.timedelta(minutes=29), td)
+        datetime.timedelta(0, 1800)
+        >>> round_to_nearest(datetime.timedelta(minutes=30), td)
+        datetime.timedelta(0, 1800)
+        >>> round_to_nearest(datetime.timedelta(minutes=42), td)
+        datetime.timedelta(0, 1800)
+        >>> round_to_nearest(datetime.timedelta(hours=7, minutes=22), td)
+        datetime.timedelta(0, 27000)
+        
+        >>> td = datetime.timedelta(minutes=15)
+        >>> round_to_nearest(datetime.timedelta(minutes=0), td)
+        datetime.timedelta(0)
+        >>> round_to_nearest(datetime.timedelta(minutes=14), td)
+        datetime.timedelta(0, 900)
+        >>> round_to_nearest(datetime.timedelta(minutes=15), td)
+        datetime.timedelta(0, 900)
+        >>> round_to_nearest(datetime.timedelta(minutes=29), td)
+        datetime.timedelta(0, 1800)
+        >>> round_to_nearest(datetime.timedelta(minutes=30), td)
+        datetime.timedelta(0, 1800)
+        >>> round_to_nearest(datetime.timedelta(minutes=42), td)
+        datetime.timedelta(0, 2700)
+        >>> round_to_nearest(datetime.timedelta(hours=7, minutes=22), td)
+        datetime.timedelta(0, 26100)
+
+        >>> td = datetime.timedelta(minutes=30)
+        >>> round_to_nearest(datetime.datetime(2010,1,1,9,22), td)
+        datetime.datetime(2010, 1, 1, 9, 30)
+        >>> round_to_nearest(datetime.datetime(2010,1,1,9,32), td)
+        datetime.datetime(2010, 1, 1, 9, 30)
+        >>> round_to_nearest(datetime.datetime(2010,1,1,9,42), td)
+        datetime.datetime(2010, 1, 1, 9, 30)
+
+        >>> round_to_nearest(datetime.time(0,20), td)
+        datetime.time(0, 30)
+        
+        TODO: test with tzinfo (non-naive) datetimes/times.
+        """
+    

@@ -1,6 +1,8 @@
 
 import re
 import datetime
+from decimal import Decimal
+from numbers import Number
 
 def nice_repr(timedelta, display="long"):
     """
@@ -14,6 +16,8 @@ def nice_repr(timedelta, display="long"):
     >>> nice_repr(td(days=1, seconds=1), "minimal")
     '1d, 1s'
     """
+    
+    assert isinstance(timedelta, datetime.timedelta), "First argument must be a timedelta."
     
     result = ""
     
@@ -32,7 +36,7 @@ def nice_repr(timedelta, display="long"):
     
     values = [weeks, days, hours, minutes, seconds]
     
-    for i in range(4):
+    for i in range(len(values)):
         if values[i]:
             if values[i] == 1 and len(words[i]) > 1:
                 result += "%i%s, " % (values[i], words[i].rstrip('s'))
@@ -44,6 +48,11 @@ def nice_repr(timedelta, display="long"):
 def parse(string):
     """
     Parse a string into a timedelta object.
+    
+    >>> parse("1 day")
+    datetime.timedelta(1)
+    >>> parse("2 days")
+    datetime.timedelta(2)
     """
     # This is the format we sometimes get from Postgres.
     d = re.match(r'((?P<days>\d+) days )?(?P<hours>\d+):'
@@ -54,43 +63,51 @@ def parse(string):
     else:
         # This is the more flexible format
         d = re.match(
-                     r'^((?P<weeks>\d+)\W*w((ee)?k(s)?)(,)?\W*)?'
-                     r'((?P<days>\d+)\W*d(ay(s)?)?(,)?\W*)?'
-                     r'((?P<hours>\d+)\W*h(ou)?r(s)?(,)?\W*)?'
-                     r'((?P<minutes>\d+)\W*m(in(ute)?)?(s)?(,)?\W*)?'
-                     r'((?P<seconds>\d+)\W*s(ec(ond)?(s)?)?)?\W*$',
+                     r'^((?P<weeks>((\d*\.\d+)|\d+))\W*w((ee)?k(s)?)(,)?\W*)?'
+                     r'((?P<days>((\d*\.\d+)|\d+))\W*d(ay(s)?)?(,)?\W*)?'
+                     r'((?P<hours>((\d*\.\d+)|\d+))\W*h(ou)?r(s)?(,)?\W*)?'
+                     r'((?P<minutes>((\d*\.\d+)|\d+))\W*m(in(ute)?)?(s)?(,)?\W*)?'
+                     r'((?P<seconds>((\d*\.\d+)|\d+))\W*s(ec(ond)?(s)?)?)?\W*$',
                      str(string))
         if not d:
-            raise TypeError("%s is not a valid time interval" % string)
+            raise TypeError("'%s' is not a valid time interval" % string)
         d = d.groupdict()
     
-    return datetime.timedelta(**dict(( (k, int(v)) for k,v in d.items() 
+    return datetime.timedelta(**dict(( (k, float(v)) for k,v in d.items() 
         if v is not None )))
 
 
 def divide(obj1, obj2, float=False):
     """
-    Allows for the division of timedeltas by other timedeltas.
-    
-    >>> divide(datetime.timedelta(1), datetime.timedelta(hours=6))
-    4
-    >>> divide(datetime.timedelta(2), datetime.timedelta(3))
-    0
+    Allows for the division of timedeltas by other timedeltas, or by
+    floats/Decimals
     """
-    assert isinstance(obj1, datetime.timedelta)
-    assert isinstance(obj2, datetime.timedelta)
+    assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
+    assert isinstance(obj2, (datetime.timedelta, Number, Decimal)), "Second argument must be a timedelta or number"
     
     sec1 = obj1.days * 86400 + obj1.seconds
-    sec2 = obj2.days * 86400 + obj2.seconds
-    if float:
-        sec1 *= 1.0
-    return sec1 / sec2
+    if isinstance(obj2, datetime.timedelta):
+        sec2 = obj2.days * 86400 + obj2.seconds
+        if float:
+            sec1 *= 1.0
+        return sec1 / sec2
+    else:
+        if float:
+            assert None, "float=True is inappropriate when dividing timedelta by a number."
+        secs = sec1 / obj2
+        if isinstance(secs, Decimal):
+            secs = float(secs)
+        return datetime.timedelta(seconds=secs)
 
 def percentage(obj1, obj2):
     """
+    What percentage of obj2 is obj1? We want the answer as a float.
     >>> percentage(datetime.timedelta(2), datetime.timedelta(4))
     50.0
     """
+    assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
+    assert isinstance(obj2, datetime.timedelta), "Second argument must be a timedelta."
+    
     return divide(obj1 * 100, obj2, float=True)
 
 def multiply(obj, val):
@@ -98,10 +115,13 @@ def multiply(obj, val):
     Allows for the multiplication of timedeltas by float values.
     """
     
-    assert isinstance(obj, datetime.timedelta)
+    assert isinstance(obj, datetime.timedelta), "First argument must be a timedelta."
+    assert isinstance(val, (Number, Decimal)), "Second argument must be a number."
     
     sec = obj.days * 86400 + obj.seconds
     sec *= val
+    if isinstance(sec, Decimal):
+        sec = float(sec)
     return datetime.timedelta(seconds=sec)
 
 
@@ -110,50 +130,10 @@ def round_to_nearest(obj, timedelta):
     The obj is rounded to the nearest whole number of timedeltas.
     
     obj can be a timedelta, datetime or time object.
-    
-    >>> td = datetime.timedelta(minutes=30)
-    >>> round_to_nearest(datetime.timedelta(minutes=0), td)
-    datetime.timedelta(0)
-    >>> round_to_nearest(datetime.timedelta(minutes=14), td)
-    datetime.timedelta(0)
-    >>> round_to_nearest(datetime.timedelta(minutes=15), td)
-    datetime.timedelta(0, 1800)
-    >>> round_to_nearest(datetime.timedelta(minutes=29), td)
-    datetime.timedelta(0, 1800)
-    >>> round_to_nearest(datetime.timedelta(minutes=30), td)
-    datetime.timedelta(0, 1800)
-    >>> round_to_nearest(datetime.timedelta(minutes=42), td)
-    datetime.timedelta(0, 1800)
-    >>> round_to_nearest(datetime.timedelta(hours=7, minutes=22), td)
-    datetime.timedelta(0, 27000)
-    
-    >>> td = datetime.timedelta(minutes=15)
-    >>> round_to_nearest(datetime.timedelta(minutes=0), td)
-    datetime.timedelta(0)
-    >>> round_to_nearest(datetime.timedelta(minutes=14), td)
-    datetime.timedelta(0, 900)
-    >>> round_to_nearest(datetime.timedelta(minutes=15), td)
-    datetime.timedelta(0, 900)
-    >>> round_to_nearest(datetime.timedelta(minutes=29), td)
-    datetime.timedelta(0, 1800)
-    >>> round_to_nearest(datetime.timedelta(minutes=30), td)
-    datetime.timedelta(0, 1800)
-    >>> round_to_nearest(datetime.timedelta(minutes=42), td)
-    datetime.timedelta(0, 2700)
-    >>> round_to_nearest(datetime.timedelta(hours=7, minutes=22), td)
-    datetime.timedelta(0, 26100)
-    
-    >>> td = datetime.timedelta(minutes=30)
-    >>> round_to_nearest(datetime.datetime(2010,1,1,9,22), td)
-    datetime.datetime(2010, 1, 1, 9, 30)
-    >>> round_to_nearest(datetime.datetime(2010,1,1,9,32), td)
-    datetime.datetime(2010, 1, 1, 9, 30)
-    >>> round_to_nearest(datetime.datetime(2010,1,1,9,42), td)
-    datetime.datetime(2010, 1, 1, 9, 30)
-    
-    >>> round_to_nearest(datetime.time(0,20), td)
-    datetime.time(0, 30)
     """
+    
+    assert isinstance(obj, (datetime.datetime, datetime.timedelta, datetime.time)), "First argument must be datetime, time or timedelta."
+    assert isinstance(timedelta, datetime.timedelta), "Second argument must be a timedelta."
     
     time_only = False
     if isinstance(obj, datetime.timedelta):
@@ -161,7 +141,7 @@ def round_to_nearest(obj, timedelta):
     elif isinstance(obj, datetime.datetime):
         counter = datetime.datetime.combine(obj.date(), datetime.time(0, tzinfo=obj.tzinfo))
     elif isinstance(obj, datetime.time):
-        counter = datetime.datetime.combine(datetime.date.today(obj.tzinfo), datetime.time(0, tzinfo=obj.tzinfo))
+        counter = datetime.datetime.combine(datetime.date.today(), datetime.time(0, tzinfo=obj.tzinfo))
         obj = datetime.datetime.combine(datetime.date.today(), obj)
         time_only = True
     
