@@ -2,7 +2,6 @@
 import re
 import datetime
 from decimal import Decimal
-from numbers import Number
 
 def nice_repr(timedelta, display="long"):
     """
@@ -83,7 +82,7 @@ def divide(obj1, obj2, float=False):
     floats/Decimals
     """
     assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
-    assert isinstance(obj2, (datetime.timedelta, Number, Decimal)), "Second argument must be a timedelta or number"
+    assert isinstance(obj2, (datetime.timedelta, int, float, Decimal)), "Second argument must be a timedelta or number"
     
     sec1 = obj1.days * 86400 + obj1.seconds
     if isinstance(obj2, datetime.timedelta):
@@ -116,7 +115,7 @@ def multiply(obj, val):
     """
     
     assert isinstance(obj, datetime.timedelta), "First argument must be a timedelta."
-    assert isinstance(val, (Number, Decimal)), "Second argument must be a number."
+    assert isinstance(val, (int, float, Decimal)), "Second argument must be a number."
     
     sec = obj.days * 86400 + obj.seconds
     sec *= val
