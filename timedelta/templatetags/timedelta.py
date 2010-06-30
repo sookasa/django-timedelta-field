@@ -2,7 +2,7 @@ from django import template
 register = template.Library()
 
 # Don't really like using relative imports, but no choice here!
-from ..models import nice_repr
+from ..helpers import nice_repr
 
 @register.filter(name='timedelta')
 def timedelta(value, display="long"):
