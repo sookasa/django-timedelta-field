@@ -55,7 +55,7 @@ def parse(string):
     """
     # This is the format we sometimes get from Postgres.
     d = re.match(r'((?P<days>\d+) days )?(?P<hours>\d+):'
-                 r'(?P<minutes>\d+):(?P<seconds>\d+)',
+                 r'(?P<minutes>\d+)(:(?P<seconds>\d+))?',
                  str(string))
     if d: 
         d = d.groupdict(0)
@@ -82,7 +82,7 @@ def divide(obj1, obj2, float=False):
     floats/Decimals
     """
     assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
-    assert isinstance(obj2, (datetime.timedelta, int, float, Decimal)), "Second argument must be a timedelta or number"
+    #assert isinstance(obj2, (datetime.timedelta, int, float, Decimal)), "Second argument must be a timedelta or number"
     
     sec1 = obj1.days * 86400 + obj1.seconds
     if isinstance(obj2, datetime.timedelta):
