@@ -44,6 +44,44 @@ def nice_repr(timedelta, display="long"):
     
     return result[:-2]
 
+
+def iso8601_repr(timedelta):
+    """
+    Represent a timedelta as an ISO8601 duration.
+    http://en.wikipedia.org/wiki/ISO_8601#Durations
+
+    >>> from datetime import timedelta as td
+    >>> iso8601_repr(td(days=1, hours=2, minutes=3, seconds=4))
+    'P1DT2HM3S4'
+    """
+    years = timedelta.days / 365
+    weeks = (timedelta.days % 365) / 7
+    days = timedelta.days % 7
+
+    hours = timedelta.seconds / 3600
+    minutes = (timedelta.seconds % 3600) / 60
+    seconds = timedelta.seconds % 60
+
+    formatting = {'P': {'Y': years,
+                        'W': weeks,
+                        'D': days
+                        },
+                  'T': {'H': hours,
+                        'M': minutes,
+                        'S': seconds
+                        }
+                  }
+
+    result = ''
+    for category, subcats  in formatting.items():
+        result += category
+        for format, value in subcats.items():
+            if value:
+                result += '%d%c' % (value, format)
+
+    return result
+        
+
 def parse(string):
     """
     Parse a string into a timedelta object.
