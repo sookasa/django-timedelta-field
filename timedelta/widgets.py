@@ -23,6 +23,9 @@ class TimedeltaWidget(forms.TextInput):
         We need to make sure the objects are of the canonical form, as a
         string comparison may needlessly fail.
         """
+        if initial in ["", None] and data in ["", None]:
+            return False
+        
         if not isinstance(initial, datetime.timedelta):
             initial = parse(initial)
         if not isinstance(data, datetime.timedelta):
