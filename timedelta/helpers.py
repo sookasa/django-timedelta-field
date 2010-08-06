@@ -162,3 +162,9 @@ def round_to_nearest(obj, timedelta):
     else:
         return result
 
+def decimal_hours(timedelta):
+    """
+    Return a decimal value of the number of hours that this timedelta
+    object refers to.
+    """
+    return Decimal(timedelta.days*24) + Decimal(timedelta.seconds) / 3600

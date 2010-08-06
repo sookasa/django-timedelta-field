@@ -193,3 +193,12 @@ class TimedeltaHelpersTest(TestCase):
         TODO: test with tzinfo (non-naive) datetimes/times.
         """
     
+    def test_decimal_hours(self):
+        """
+        >>> decimal_hours(datetime.timedelta(hours=5, minutes=30))
+        Decimal('5.5')
+        >>> decimal_hours(datetime.timedelta(hours=5))
+        Decimal('5')
+        >>> decimal_hours(datetime.timedelta(hours=9, minutes=20))
+        Decimal('9.333333333333333333333333333')
+        """
