@@ -40,3 +40,9 @@ Todo
 
 Handle strings with times in other languages. I'm not really sure about how
 to do this, but it may be useful.
+
+Changelog
+----------
+
+0.3.1: added the connection and prepared arguments to get_db_prep_value(),
+    so that django 1.3+ will not complain of DeprecationWarnings.

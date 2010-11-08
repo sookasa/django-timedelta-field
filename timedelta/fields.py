@@ -33,7 +33,7 @@ class TimedeltaField(models.Field):
             return datetime.timedelta(0)
         return parse(value)
     
-    def get_db_prep_value(self, value):
+    def get_db_prep_value(self, value, connection, prepared=None):
         if (value is None) or isinstance(value, (str, unicode)):
             return value
         return str(value).replace(',', '')
