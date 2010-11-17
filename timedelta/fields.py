@@ -33,11 +33,14 @@ class TimedeltaField(models.Field):
             return datetime.timedelta(0)
         return parse(value)
     
-    def get_db_prep_value(self, value, connection, prepared=None):
+    def get_prep_value(self, value):
         if (value is None) or isinstance(value, (str, unicode)):
             return value
         return str(value).replace(',', '')
-    
+        
+    def get_db_prep_value(self, value, connection, prepared=None):
+        return self.get_prep_value(value)
+        
     def formfield(self, *args, **kwargs):
         defaults = {'form_class':TimedeltaFormField}
         defaults.update(kwargs)
@@ -55,11 +58,8 @@ class TimedeltaField(models.Field):
         if self.has_default():
             if callable(self.default):
                 return self.default()
-            return self.get_db_prep_value(self.default)
-        if not self.empty_strings_allowed or (
-            self.null #and not \
-            #connection.features.interprets_empty_strings_as_nulls
-        ):
+            return self.get_prep_value(self.default)
+        if not self.empty_strings_allowed or (self.null):
             return None
         return ""
         
