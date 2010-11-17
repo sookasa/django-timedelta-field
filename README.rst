@@ -43,6 +43,8 @@ to do this, but it may be useful.
 
 Changelog
 ----------
+0.4.1: changed get_db_prep_value() code to be in get_prep_value(), since I
+    was calling it in get_default(), without a connection value.
 
-0.3.1: added the connection and prepared arguments to get_db_prep_value(),
+0.4: added the connection and prepared arguments to get_db_prep_value(),
     so that django 1.3+ will not complain of DeprecationWarnings.
