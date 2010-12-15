@@ -76,28 +76,42 @@ def parse(string):
         if v is not None )))
 
 
-def divide(obj1, obj2, float=False):
+def divide(obj1, obj2, as_float=False):
     """
     Allows for the division of timedeltas by other timedeltas, or by
     floats/Decimals
     """
     assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
-    #assert isinstance(obj2, (datetime.timedelta, int, float, Decimal)), "Second argument must be a timedelta or number"
+    assert isinstance(obj2, (datetime.timedelta, int, float, Decimal)), "Second argument must be a timedelta or number"
     
     sec1 = obj1.days * 86400 + obj1.seconds
     if isinstance(obj2, datetime.timedelta):
         sec2 = obj2.days * 86400 + obj2.seconds
-        if float:
+        if as_float:
             sec1 *= 1.0
         return sec1 / sec2
     else:
-        if float:
+        if as_float:
             assert None, "float=True is inappropriate when dividing timedelta by a number."
         secs = sec1 / obj2
         if isinstance(secs, Decimal):
             secs = float(secs)
         return datetime.timedelta(seconds=secs)
 
+def modulo(obj1, obj2):
+    """
+    Allows for remainder division of timedelta by timedelta or integer.
+    """
+    assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
+    assert isinstance(obj2, (datetime.timedelta, int)), "Second argument must be a timedelta or int."
+    
+    sec1 = obj1.days * 86400 + obj1.seconds
+    if isinstance(obj2, datetime.timedelta):
+        sec2 = obj2.days * 86400 + obj2.seconds
+        return datetime.timedelta(seconds=sec1 % sec2)
+    else:
+        return datetime.timedelta(seconds=(sec1 % obj2))
+    
 def percentage(obj1, obj2):
     """
     What percentage of obj2 is obj1? We want the answer as a float.
