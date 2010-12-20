@@ -44,6 +44,8 @@ to do this, but it may be useful.
 
 Changelog
 ----------
+0.4.4: Restore functionality for django <1.2 (thanks Yoav Aner).
+
 0.4.3: Added helpers.modulo, to allow remainder division of timedlelta objects.
 
 0.4.1: changed get_db_prep_value() code to be in get_prep_value(), since I
