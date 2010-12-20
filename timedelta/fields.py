@@ -1,10 +1,8 @@
 from django.db import models
 
 import datetime
-from collections import defaultdict
-import re
 
-from helpers import nice_repr, parse
+from helpers import parse
 from forms import TimedeltaFormField
 
 SECS_PER_DAY = 60*60*24
@@ -13,11 +11,8 @@ SECS_PER_DAY = 60*60*24
 
 class TimedeltaField(models.Field):
     """
-    Store a datetime.timedelta as an integer.
-    
-    We don't subclass models.IntegerField, as that would then use the
-    AdminIntegerWidget or whatever in the admin, and we want to use
-    our custom widget.
+    Store a datetime.timedelta as an INTERVAL in postgres, or a 
+    CHAR(20) in other database backends.
     """
     __metaclass__ = models.SubfieldBase
     _south_introspects = True
@@ -38,7 +33,7 @@ class TimedeltaField(models.Field):
             return value
         return str(value).replace(',', '')
         
-    def get_db_prep_value(self, value, connection, prepared=None):
+    def get_db_prep_value(self, value, connection=None, prepared=None):
         return self.get_prep_value(value)
         
     def formfield(self, *args, **kwargs):
