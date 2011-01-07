@@ -182,3 +182,9 @@ def decimal_hours(timedelta):
     object refers to.
     """
     return Decimal(timedelta.days*24) + Decimal(timedelta.seconds) / 3600
+
+def week_containing(date):
+    if date.weekday():
+        date -= datetime.timedelta(date.weekday())
+    
+    return date, date + datetime.timedelta(6)
