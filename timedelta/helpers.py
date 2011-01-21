@@ -176,12 +176,15 @@ def round_to_nearest(obj, timedelta):
     else:
         return result
 
-def decimal_hours(timedelta):
+def decimal_hours(timedelta, decimal_places=None):
     """
     Return a decimal value of the number of hours that this timedelta
     object refers to.
     """
-    return Decimal(timedelta.days*24) + Decimal(timedelta.seconds) / 3600
+    hours = Decimal(timedelta.days*24) + Decimal(timedelta.seconds) / 3600
+    if decimal_places:
+        return hours.quantize(Decimal(str(10**-decimal_places)))
+    return hours
 
 def week_containing(date):
     if date.weekday():
