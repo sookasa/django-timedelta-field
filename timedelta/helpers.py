@@ -121,7 +121,7 @@ def percentage(obj1, obj2):
     assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
     assert isinstance(obj2, datetime.timedelta), "Second argument must be a timedelta."
     
-    return divide(obj1 * 100, obj2, float=True)
+    return divide(obj1 * 100, obj2, as_float=True)
 
 def multiply(obj, val):
     """
