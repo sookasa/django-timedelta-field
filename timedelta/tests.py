@@ -126,14 +126,14 @@ class TimedeltaHelpersTest(TestCase):
         4
         >>> divide(datetime.timedelta(2), datetime.timedelta(3))
         0
-        >>> divide(datetime.timedelta(8), datetime.timedelta(3), float=True)
+        >>> divide(datetime.timedelta(8), datetime.timedelta(3), as_float=True)
         2.6666666666666665
         >>> divide(datetime.timedelta(8), 2.0)
         datetime.timedelta(4)
-        >>> divide(datetime.timedelta(8), 2, float=True)
+        >>> divide(datetime.timedelta(8), 2, as_float=True)
         Traceback (most recent call last):
             ...
-        AssertionError: float=True is inappropriate when dividing timedelta by a number.
+        AssertionError: as_float=True is inappropriate when dividing timedelta by a number.
         """
     
     def percentage(self):

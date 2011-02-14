@@ -92,7 +92,7 @@ def divide(obj1, obj2, as_float=False):
         return sec1 / sec2
     else:
         if as_float:
-            assert None, "float=True is inappropriate when dividing timedelta by a number."
+            assert None, "as_float=True is inappropriate when dividing timedelta by a number."
         secs = sec1 / obj2
         if isinstance(secs, Decimal):
             secs = float(secs)
