@@ -1,5 +1,6 @@
 from django.db import models
 
+from collections import defaultdict
 import datetime
 
 from helpers import parse
@@ -8,6 +9,11 @@ from forms import TimedeltaFormField
 SECS_PER_DAY = 60*60*24
 
 # TODO: Figure out why django admin thinks fields of this type have changed every time an object is saved.
+
+# Define the different column types that different databases can use.
+COLUMN_TYPES = defaultdict(lambda:"char(20)")
+COLUMN_TYPES["django.db.backends.postgresql_psycopg2"] = "interval"
+COLUMN_TYPES["django.contrib.gis.db.backends.postgis"] = "interval"
 
 class TimedeltaField(models.Field):
     """
@@ -59,12 +65,6 @@ class TimedeltaField(models.Field):
         return ""
         
     def db_type(self, connection):
-        """
-        Postgres allows us to store stuff as an INTERVAL type. This is 
-        useful, and we can then use database logic to do tests.
-        """
-        if connection.settings_dict['ENGINE'] == "django.db.backends.postgresql_psycopg2":
-            return 'interval'
-        else:
-            return 'char(20)'
+        return COLUMN_TYPES[connection.settings_dict['ENGINE']]
+
 
