@@ -44,6 +44,9 @@ to do this, but it may be useful.
 
 Changelog
 ----------
+0.4.6: Add in support for PostGIS database.
+	Make it easier to add in other column types for other databases.
+
 0.4.5: Restore functionality for django <1.2 (thanks Yoav Aner).
 
 0.4.3: Added helpers.modulo, to allow remainder division of timedlelta objects.
