@@ -78,6 +78,9 @@ class TimedeltaFormFieldTest(TestCase):
         datetime.timedelta(7)
         >>> t.clean('2 weeks, 2 days')
         datetime.timedelta(16)
+        >>> t.clean(u'2 we\xe8k, 2 days')
+        Traceback (most recent call last):
+        ValidationError: [u'Enter a valid time span: e.g. "3 days, 4 hours, 2 minutes"']
         """
 
 class TimedeltaHelpersTest(TestCase):

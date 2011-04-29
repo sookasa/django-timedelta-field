@@ -56,7 +56,7 @@ def parse(string):
     # This is the format we sometimes get from Postgres.
     d = re.match(r'((?P<days>\d+) days )?(?P<hours>\d+):'
                  r'(?P<minutes>\d+)(:(?P<seconds>\d+))?',
-                 str(string))
+                 unicode(string))
     if d: 
         d = d.groupdict(0)
     else:
@@ -67,7 +67,7 @@ def parse(string):
                      r'((?P<hours>((\d*\.\d+)|\d+))\W*h(ou)?r(s)?(,)?\W*)?'
                      r'((?P<minutes>((\d*\.\d+)|\d+))\W*m(in(ute)?)?(s)?(,)?\W*)?'
                      r'((?P<seconds>((\d*\.\d+)|\d+))\W*s(ec(ond)?(s)?)?)?\W*$',
-                     str(string))
+                     unicode(string))
         if not d:
             raise TypeError("'%s' is not a valid time interval" % string)
         d = d.groupdict()
