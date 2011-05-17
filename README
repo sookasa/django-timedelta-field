@@ -44,6 +44,8 @@ to do this, but it may be useful.
 
 Changelog
 ----------
+0.4.7: Bugfix from savemu: use unicode() instead of str()
+
 0.4.6: Add in support for PostGIS database.
 	Make it easier to add in other column types for other databases.
 
