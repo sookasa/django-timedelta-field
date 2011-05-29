@@ -29,3 +29,10 @@ class TimedeltaFormField(forms.Field):
             raise forms.ValidationError(self.error_messages['invalid'])
             
         return datetime.timedelta(**data)
+
+class TimedeltaChoicesField(TimedeltaFormField):
+    def __init__(self, *args, **kwargs):
+        choices = kwargs.pop('choices')
+        defaults = {'widget':forms.Select(choices=choices)}
+        defaults.update(kwargs)
+        super(TimedeltaChoicesField, self).__init__(*args, **defaults)

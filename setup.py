@@ -1,10 +1,10 @@
 from distutils.core import setup
 
 setup(
-    name = "timedelta",
-    version = "0.2",
+    name = "django-timedeltafield",
+    version = "0.4.7",
     description = "TimedeltaField for django models",
-    url = "http://bitbucket.org/schinckel/django-timedelta-field/",
+    url = "http://hg.schinckel.net/django-timedelta-field/",
     author = "Matthew Schinckel",
     author_email = "matt@schinckel.net",
     packages = [

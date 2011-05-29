@@ -78,6 +78,9 @@ class TimedeltaFormFieldTest(TestCase):
         datetime.timedelta(7)
         >>> t.clean('2 weeks, 2 days')
         datetime.timedelta(16)
+        >>> t.clean(u'2 we\xe8k, 2 days')
+        Traceback (most recent call last):
+        ValidationError: [u'Enter a valid time span: e.g. "3 days, 4 hours, 2 minutes"']
         """
 
 class TimedeltaHelpersTest(TestCase):
@@ -126,14 +129,14 @@ class TimedeltaHelpersTest(TestCase):
         4
         >>> divide(datetime.timedelta(2), datetime.timedelta(3))
         0
-        >>> divide(datetime.timedelta(8), datetime.timedelta(3), float=True)
+        >>> divide(datetime.timedelta(8), datetime.timedelta(3), as_float=True)
         2.6666666666666665
         >>> divide(datetime.timedelta(8), 2.0)
         datetime.timedelta(4)
-        >>> divide(datetime.timedelta(8), 2, float=True)
+        >>> divide(datetime.timedelta(8), 2, as_float=True)
         Traceback (most recent call last):
             ...
-        AssertionError: float=True is inappropriate when dividing timedelta by a number.
+        AssertionError: as_float=True is inappropriate when dividing timedelta by a number.
         """
     
     def percentage(self):
@@ -193,3 +196,12 @@ class TimedeltaHelpersTest(TestCase):
         TODO: test with tzinfo (non-naive) datetimes/times.
         """
     
+    def test_decimal_hours(self):
+        """
+        >>> decimal_hours(datetime.timedelta(hours=5, minutes=30))
+        Decimal('5.5')
+        >>> decimal_hours(datetime.timedelta(hours=5))
+        Decimal('5')
+        >>> decimal_hours(datetime.timedelta(hours=9, minutes=20))
+        Decimal('9.333333333333333333333333333')
+        """

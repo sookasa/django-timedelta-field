@@ -33,10 +33,28 @@ To use, install the package, and use the field::
         the_timedelta = timedelta.TimedeltaField()
 
 There are also some useful methods in helpers.py to work with timedelta
-objects.
+objects. (eg, multiply, divide, modulo and percentages).
+
 
 Todo
 -------------
 
 Handle strings with times in other languages. I'm not really sure about how
 to do this, but it may be useful.
+
+Changelog
+----------
+0.4.7: Bugfix from savemu: use unicode() instead of str()
+
+0.4.6: Add in support for PostGIS database.
+	Make it easier to add in other column types for other databases.
+
+0.4.5: Restore functionality for django <1.2 (thanks Yoav Aner).
+
+0.4.3: Added helpers.modulo, to allow remainder division of timedlelta objects.
+
+0.4.1: changed get_db_prep_value() code to be in get_prep_value(), since I
+    was calling it in get_default(), without a connection value.
+
+0.4: added the connection and prepared arguments to get_db_prep_value(),
+    so that django 1.3+ will not complain of DeprecationWarnings.

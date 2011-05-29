@@ -94,7 +94,7 @@ def parse(string):
     # This is the format we sometimes get from Postgres.
     d = re.match(r'((?P<days>\d+) days )?(?P<hours>\d+):'
                  r'(?P<minutes>\d+)(:(?P<seconds>\d+))?',
-                 str(string))
+                 unicode(string))
     if d: 
         d = d.groupdict(0)
     else:
@@ -105,7 +105,7 @@ def parse(string):
                      r'((?P<hours>((\d*\.\d+)|\d+))\W*h(ou)?r(s)?(,)?\W*)?'
                      r'((?P<minutes>((\d*\.\d+)|\d+))\W*m(in(ute)?)?(s)?(,)?\W*)?'
                      r'((?P<seconds>((\d*\.\d+)|\d+))\W*s(ec(ond)?(s)?)?)?\W*$',
-                     str(string))
+                     unicode(string))
         if not d:
             raise TypeError("'%s' is not a valid time interval" % string)
         d = d.groupdict()
@@ -114,28 +114,42 @@ def parse(string):
         if v is not None )))
 
 
-def divide(obj1, obj2, float=False):
+def divide(obj1, obj2, as_float=False):
     """
     Allows for the division of timedeltas by other timedeltas, or by
     floats/Decimals
     """
     assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
-    #assert isinstance(obj2, (datetime.timedelta, int, float, Decimal)), "Second argument must be a timedelta or number"
+    assert isinstance(obj2, (datetime.timedelta, int, float, Decimal)), "Second argument must be a timedelta or number"
     
     sec1 = obj1.days * 86400 + obj1.seconds
     if isinstance(obj2, datetime.timedelta):
         sec2 = obj2.days * 86400 + obj2.seconds
-        if float:
+        if as_float:
             sec1 *= 1.0
         return sec1 / sec2
     else:
-        if float:
-            assert None, "float=True is inappropriate when dividing timedelta by a number."
+        if as_float:
+            assert None, "as_float=True is inappropriate when dividing timedelta by a number."
         secs = sec1 / obj2
         if isinstance(secs, Decimal):
             secs = float(secs)
         return datetime.timedelta(seconds=secs)
 
+def modulo(obj1, obj2):
+    """
+    Allows for remainder division of timedelta by timedelta or integer.
+    """
+    assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
+    assert isinstance(obj2, (datetime.timedelta, int)), "Second argument must be a timedelta or int."
+    
+    sec1 = obj1.days * 86400 + obj1.seconds
+    if isinstance(obj2, datetime.timedelta):
+        sec2 = obj2.days * 86400 + obj2.seconds
+        return datetime.timedelta(seconds=sec1 % sec2)
+    else:
+        return datetime.timedelta(seconds=(sec1 % obj2))
+    
 def percentage(obj1, obj2):
     """
     What percentage of obj2 is obj1? We want the answer as a float.
@@ -145,7 +159,7 @@ def percentage(obj1, obj2):
     assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
     assert isinstance(obj2, datetime.timedelta), "Second argument must be a timedelta."
     
-    return divide(obj1 * 100, obj2, float=True)
+    return divide(obj1 * 100, obj2, as_float=True)
 
 def multiply(obj, val):
     """
@@ -200,3 +214,18 @@ def round_to_nearest(obj, timedelta):
     else:
         return result
 
+def decimal_hours(timedelta, decimal_places=None):
+    """
+    Return a decimal value of the number of hours that this timedelta
+    object refers to.
+    """
+    hours = Decimal(timedelta.days*24) + Decimal(timedelta.seconds) / 3600
+    if decimal_places:
+        return hours.quantize(Decimal(str(10**-decimal_places)))
+    return hours
+
+def week_containing(date):
+    if date.weekday():
+        date -= datetime.timedelta(date.weekday())
+    
+    return date, date + datetime.timedelta(6)

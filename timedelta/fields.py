@@ -1,23 +1,24 @@
 from django.db import models
 
-import datetime
 from collections import defaultdict
-import re
+import datetime
 
-from helpers import nice_repr, parse
+from helpers import parse
 from forms import TimedeltaFormField
 
 SECS_PER_DAY = 60*60*24
 
 # TODO: Figure out why django admin thinks fields of this type have changed every time an object is saved.
 
+# Define the different column types that different databases can use.
+COLUMN_TYPES = defaultdict(lambda:"char(20)")
+COLUMN_TYPES["django.db.backends.postgresql_psycopg2"] = "interval"
+COLUMN_TYPES["django.contrib.gis.db.backends.postgis"] = "interval"
+
 class TimedeltaField(models.Field):
     """
-    Store a datetime.timedelta as an integer.
-    
-    We don't subclass models.IntegerField, as that would then use the
-    AdminIntegerWidget or whatever in the admin, and we want to use
-    our custom widget.
+    Store a datetime.timedelta as an INTERVAL in postgres, or a 
+    CHAR(20) in other database backends.
     """
     __metaclass__ = models.SubfieldBase
     _south_introspects = True
@@ -33,11 +34,14 @@ class TimedeltaField(models.Field):
             return datetime.timedelta(0)
         return parse(value)
     
-    def get_db_prep_value(self, value):
+    def get_prep_value(self, value):
         if (value is None) or isinstance(value, (str, unicode)):
             return value
         return str(value).replace(',', '')
-    
+        
+    def get_db_prep_value(self, value, connection=None, prepared=None):
+        return self.get_prep_value(value)
+        
     def formfield(self, *args, **kwargs):
         defaults = {'form_class':TimedeltaFormField}
         defaults.update(kwargs)
@@ -55,21 +59,12 @@ class TimedeltaField(models.Field):
         if self.has_default():
             if callable(self.default):
                 return self.default()
-            return self.get_db_prep_value(self.default)
-        if not self.empty_strings_allowed or (
-            self.null #and not \
-            #connection.features.interprets_empty_strings_as_nulls
-        ):
+            return self.get_prep_value(self.default)
+        if not self.empty_strings_allowed or (self.null):
             return None
         return ""
         
     def db_type(self, connection):
-        """
-        Postgres allows us to store stuff as an INTERVAL type. This is 
-        useful, and we can then use database logic to do tests.
-        """
-        if connection.settings_dict['ENGINE'] == "django.db.backends.postgresql_psycopg2":
-            return 'interval'
-        else:
-            return 'char(20)'
+        return COLUMN_TYPES[connection.settings_dict['ENGINE']]
+
 
