@@ -3,7 +3,7 @@ import re
 import datetime
 from decimal import Decimal
 
-def nice_repr(timedelta, display="long"):
+def nice_repr(timedelta, display="long", sep=" "):
     """
     Turns a datetime.timedelta object into a nice string repr.
     
@@ -18,7 +18,7 @@ def nice_repr(timedelta, display="long"):
     
     assert isinstance(timedelta, datetime.timedelta), "First argument must be a timedelta."
     
-    result = ""
+    result = []
     
     weeks = timedelta.days / 7
     days = timedelta.days % 7
@@ -26,7 +26,10 @@ def nice_repr(timedelta, display="long"):
     minutes = (timedelta.seconds % 3600) / 60
     seconds = timedelta.seconds % 60
     
-    if display == 'minimal':
+    if display == "sql":
+        days += weeks * 7
+        return "%i %02i:%02i:%02i" % (days, hours, minutes, seconds)
+    elif display == 'minimal':
         words = ["w", "d", "h", "m", "s"]
     elif display == 'short':
         words = [" wks", " days", " hrs", " min", " sec"]
@@ -38,11 +41,11 @@ def nice_repr(timedelta, display="long"):
     for i in range(len(values)):
         if values[i]:
             if values[i] == 1 and len(words[i]) > 1:
-                result += "%i%s, " % (values[i], words[i].rstrip('s'))
+                result.append("%i%s" % (values[i], words[i].rstrip('s')))
             else:
-                result += "%i%s, " % (values[i], words[i])
+                result.append("%i%s" % (values[i], words[i]))
     
-    return result[:-2]
+    return sep.join(result)
 
 def parse(string):
     """
