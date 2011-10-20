@@ -35,15 +35,26 @@ To use, install the package, and use the field::
 There are also some useful methods in helpers.py to work with timedelta
 objects. (eg, multiply, divide, modulo and percentages).
 
+Additionally, there are two template filters, `timedelta` and `iso8601`, which
+will convert a timedelta object into a valid string.
+
 
 Todo
 -------------
+
+Parse ISO8601 strings. Thanks to Guillame Libersat, we can generate them. 
 
 Handle strings with times in other languages. I'm not really sure about how
 to do this, but it may be useful.
 
 Changelog
 ----------
+
+0.5: Feature from Guillaume Libersat: helper and template for ISO8601 representation.
+     Bugfix from croepha: allow for non-plural 'days' string.
+     Bugfix from Guillaume Libersat: don't explode if initial is None
+     
+
 0.4.7: Bugfix from savemu: use unicode() instead of str()
 
 0.4.6: Add in support for PostGIS database.
