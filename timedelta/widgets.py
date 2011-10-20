@@ -29,8 +29,10 @@ class TimedeltaWidget(forms.TextInput):
         if initial in ["", None] or data in ["", None]:
             return True
         
-        if not isinstance(initial, datetime.timedelta):
-            initial = parse(initial)
+        if initial:
+            if not isinstance(initial, datetime.timedelta):
+                initial = parse(initial)
+
         if not isinstance(data, datetime.timedelta):
             data = parse(data)
         
