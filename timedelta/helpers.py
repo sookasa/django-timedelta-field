@@ -95,8 +95,8 @@ def parse(string):
     >>> parse("2 days")
     datetime.timedelta(2)
     """
-    # This is the format we sometimes get from Postgres.
-    d = re.match(r'((?P<days>\d+) days? )?(?P<hours>\d+):'
+    # This is the format we get from sometimes Postgres, and from serialization
+    d = re.match(r'((?P<days>\d+) days?,? )?(?P<hours>\d+):'
                  r'(?P<minutes>\d+)(:(?P<seconds>\d+))?',
                  unicode(string))
     if d: 
