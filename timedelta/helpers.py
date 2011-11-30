@@ -54,7 +54,7 @@ def iso8601_repr(timedelta):
 
     >>> from datetime import timedelta as td
     >>> iso8601_repr(td(days=1, hours=2, minutes=3, seconds=4))
-    'P1DT2HM3S4'
+    'P1DT2H3M4S'
     """
     years = timedelta.days / 365
     weeks = (timedelta.days % 365) / 7
@@ -64,20 +64,23 @@ def iso8601_repr(timedelta):
     minutes = (timedelta.seconds % 3600) / 60
     seconds = timedelta.seconds % 60
 
-    formatting = {'P': {'Y': years,
-                        'W': weeks,
-                        'D': days
-                        },
-                  'T': {'H': hours,
-                        'M': minutes,
-                        'S': seconds
-                        }
-                  }
+    formatting = (
+        ('P', (
+            ('Y', years),
+            ('W', weeks),
+            ('D', days),
+        )),
+        ('T', (
+            ('H', hours),
+            ('M', minutes),
+            ('S', seconds),
+        )),
+      )
 
     result = ''
-    for category, subcats  in formatting.items():
+    for category, subcats in formatting:
         result += category
-        for format, value in subcats.items():
+        for format, value in subcats:
             if value:
                 result += '%d%c' % (value, format)
 
