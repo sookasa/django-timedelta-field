@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name = "django-timedeltafield",
-    version = "0.5",
+    version = "0.5.1",
     description = "TimedeltaField for django models",
     url = "http://hg.schinckel.net/django-timedelta-field/",
     author = "Matthew Schinckel",

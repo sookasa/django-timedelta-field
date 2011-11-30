@@ -50,6 +50,8 @@ to do this, but it may be useful.
 Changelog
 ----------
 
+0.5.1: Bugfixes from Mike Fogel.
+
 0.5: Feature from Guillaume Libersat: helper and template for ISO8601 representation.
      Bugfix from croepha: allow for non-plural 'days' string.
      Bugfix from Guillaume Libersat: don't explode if initial is None
