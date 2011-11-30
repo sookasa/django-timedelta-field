@@ -3,7 +3,7 @@ import re
 import datetime
 from decimal import Decimal
 
-def nice_repr(timedelta, display="long", sep=" "):
+def nice_repr(timedelta, display="long", sep=", "):
     """
     Turns a datetime.timedelta object into a nice string repr.
     
