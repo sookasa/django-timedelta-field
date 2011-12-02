@@ -1,4 +1,3 @@
-
 import re
 import datetime
 from decimal import Decimal
@@ -77,14 +76,14 @@ def iso8601_repr(timedelta):
         )),
       )
 
-    result = ''
+    result = []
     for category, subcats in formatting:
         result += category
         for format, value in subcats:
             if value:
-                result += '%d%c' % (value, format)
+                result.append('%d%c' % (value, format))
 
-    return result
+    return result.join("")
 
 def parse(string):
     """
