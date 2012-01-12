@@ -50,6 +50,8 @@ to do this, but it may be useful.
 Changelog
 ----------
 
+0.5.2: Added ``decimal_percentage``, which gives us a ``decimal.Decimal`` object.
+
 0.5.1: Bugfixes from Mike Fogel.
 
 0.5: Feature from Guillaume Libersat: helper and template for ISO8601 representation.
