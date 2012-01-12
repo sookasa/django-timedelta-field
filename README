@@ -49,6 +49,7 @@ to do this, but it may be useful.
 
 Changelog
 ----------
+0.5.3: Include long_description from this file.
 
 0.5.2: Added ``decimal_percentage``, which gives us a ``decimal.Decimal`` object.
 
