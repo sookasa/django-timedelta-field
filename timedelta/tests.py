@@ -143,7 +143,7 @@ class TimedeltaHelpersTest(TestCase):
         AssertionError: as_float=True is inappropriate when dividing timedelta by a number.
         """
     
-    def percentage(self):
+    def test_percentage(self):
         """
         >>> percentage(datetime.timedelta(4), datetime.timedelta(2))
         200.0
@@ -151,6 +151,16 @@ class TimedeltaHelpersTest(TestCase):
         50.0
         
         """
+    
+    def test_decimal_percentage(self):
+        """
+        >>> decimal_percentage(datetime.timedelta(4), datetime.timedelta(2))
+        Decimal('200.0')
+        >>> decimal_percentage(datetime.timedelta(2), datetime.timedelta(4))
+        Decimal('50.0')
+        
+        """
+    
     
     def test_round_to_nearest(self):
         """

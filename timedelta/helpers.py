@@ -164,6 +164,14 @@ def percentage(obj1, obj2):
     
     return divide(obj1 * 100, obj2, as_float=True)
 
+def decimal_percentage(obj1, obj2):
+    """
+    >>> decimal_percentage(datetime.timedelta(2), datetime.timedelta(4))
+    Decimal('50.0')
+    """
+    return Decimal(str(percentage(obj1, obj2)))
+    
+    
 def multiply(obj, val):
     """
     Allows for the multiplication of timedeltas by float values.
