@@ -240,3 +240,15 @@ def week_containing(date):
         date -= datetime.timedelta(date.weekday())
     
     return date, date + datetime.timedelta(6)
+
+try:
+    datetime.timedelta().total_seconds
+    def total_seconds(timedelta):
+        return timedelta.total_seconds()
+except AttributeError:
+    def total_seconds(timedelta):
+        """
+        Python < 2.7 does not have datetime.timedelta.total_seconds
+        """
+        return timedelta.days * 86400 + timedelta.seconds
+
