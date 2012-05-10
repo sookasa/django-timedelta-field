@@ -49,6 +49,8 @@ to do this, but it may be useful.
 
 Changelog
 ----------
+0.6.1: Remember to include VERSION number.
+
 0.6.0: Added total_seconds helper (for python < 2.7)
 
 0.5.3: Include long_description from this file.

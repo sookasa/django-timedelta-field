@@ -11,7 +11,9 @@ setup(
     author_email = "matt@schinckel.net",
     packages = [
         "timedelta",
+        "timedelta.templatetags",
     ],
+    package_data = {'timedelta': ['timedelta/VERSION']},
     classifiers = [
         'Programming Language :: Python',
         'License :: OSI Approved :: BSD License',
