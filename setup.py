@@ -13,7 +13,7 @@ setup(
         "timedelta",
         "timedelta.templatetags",
     ],
-    package_data = {'timedelta': ['timedelta/VERSION']},
+    package_data = {'timedelta': ['VERSION']},
     classifiers = [
         'Programming Language :: Python',
         'License :: OSI Approved :: BSD License',
