@@ -31,7 +31,10 @@ class TimedeltaField(models.Field):
         if isinstance(value, int):
             return datetime.timedelta(seconds=value)
         if value == "":
-            return datetime.timedelta(0)
+            if self.null:
+                return None
+            else:
+                return datetime.timedelta(0)
         return parse(value)
     
     def get_prep_value(self, value):
