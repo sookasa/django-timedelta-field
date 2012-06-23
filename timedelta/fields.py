@@ -6,8 +6,6 @@ import datetime
 from helpers import parse
 from forms import TimedeltaFormField
 
-SECS_PER_DAY = 60*60*24
-
 # TODO: Figure out why django admin thinks fields of this type have changed every time an object is saved.
 
 # Define the different column types that different databases can use.
