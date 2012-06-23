@@ -30,13 +30,78 @@ To use, install the package, and use the field::
     import timedelta
     
     class MyModel(models.Model):
-        the_timedelta = timedelta.TimedeltaField()
+        the_timedelta = timedelta.fields.TimedeltaField()
 
 There are also some useful methods in helpers.py to work with timedelta
 objects. (eg, multiply, divide, modulo and percentages).
 
 Additionally, there are two template filters, `timedelta` and `iso8601`, which
 will convert a timedelta object into a valid string.
+
+Examples
+-------------
+
+Event model::
+
+    from django.db import models
+    import timedelta
+    
+    class Event(models.Model):
+        start = models.DateTimeField()
+        duration = timedelta.fields.TimedeltaField()
+        
+        @property
+        def finish(self):
+            return self.start + self.duration
+
+Storing data within the field::
+
+    evt = Event.objects.create(
+        start=datetime.datetime.now(),
+        duration=datetime.timedelta(hours=1)
+    )
+    print evt.finish
+    
+    evt.duration = datetime.timedelta(minutes=3)
+    print evt.finish
+    
+    # We can use valid strings of the format described above.
+    Event.objects.update(duration='2 hours, 45 minutes')
+    
+    evt = Event.objects.get(pk=evt.pk)
+    print evt.finish
+    
+    # We can also assign directly to this field a valid string.
+    evt.duration = '3 days, 2 hours'
+    evt.save()
+    
+    # Note: we need to re-fetch to ensure conversion to timedelta
+    evt = Event.objects.get(pk=evt.pk)
+    print evt.finish
+
+Using with a form.
+~~~~~~~~~~~~~~~~~~~~
+
+You can just use a ModelForm, and it will automatically select the 
+``TimedeltaFormField``, which will handle the conversion between
+formatted strings and timedelta objects.
+
+Or you may use the form field directly::
+
+    from django import forms
+    import timedelta
+    
+    class EventForm(forms.Form):
+        start = forms.DateTimeField()
+        duration = timedelta.forms.TimedeltaFormField()
+
+This form field will display a value in the format::
+
+    2 day, 3 hours, 1 minute
+
+And will parse data from a similar format.
+
+Have a look in tests.py for examples of the form field/widget output.
 
 
 Todo
