@@ -105,7 +105,7 @@ def parse(string):
         d = re.match(
                      r'^((?P<weeks>((\d*\.\d+)|\d+))\W*w((ee)?k(s)?)(,)?\W*)?'
                      r'((?P<days>((\d*\.\d+)|\d+))\W*d(ay(s)?)?(,)?\W*)?'
-                     r'((?P<hours>((\d*\.\d+)|\d+))\W*h(ou)?r(s)?(,)?\W*)?'
+                     r'((?P<hours>((\d*\.\d+)|\d+))\W*h(ou)?r?(s)?(,)?\W*)?'
                      r'((?P<minutes>((\d*\.\d+)|\d+))\W*m(in(ute)?)?(s)?(,)?\W*)?'
                      r'((?P<seconds>((\d*\.\d+)|\d+))\W*s(ec(ond)?(s)?)?)?\W*$',
                      unicode(string))
