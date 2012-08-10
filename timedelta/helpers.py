@@ -93,6 +93,8 @@ def parse(string):
     datetime.timedelta(1)
     >>> parse("2 days")
     datetime.timedelta(2)
+    >>> parse("1h")
+    datetime.timedelta(0, 3600)
     """
     # This is the format we get from sometimes Postgres, and from serialization
     d = re.match(r'((?P<days>\d+) days?,? )?(?P<hours>\d+):'
