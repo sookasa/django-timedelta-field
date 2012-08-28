@@ -114,6 +114,10 @@ to do this, but it may be useful.
 
 Changelog
 ----------
+0.6.4: Correctly parse '1w' (previously required 1wk).
+       Don't parse things like '1 hs', require '1 hrs'.
+       Test a bit harder.
+
 0.6.3: Correctly parse '1h' as one hour (previously required 1hr).
 
 0.6.2: Remember to include VERSION number.
