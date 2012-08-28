@@ -83,7 +83,7 @@ def iso8601_repr(timedelta):
             if value:
                 result.append('%d%c' % (value, format))
 
-    return result.join("")
+    return "".join(result)
 
 def parse(string):
     """
@@ -93,8 +93,67 @@ def parse(string):
     datetime.timedelta(1)
     >>> parse("2 days")
     datetime.timedelta(2)
+    >>> parse("1 d")
+    datetime.timedelta(1)
+    >>> parse("1 hour")
+    datetime.timedelta(0, 3600)
+    >>> parse("1 hours")
+    datetime.timedelta(0, 3600)
+    >>> parse("1 hr")
+    datetime.timedelta(0, 3600)
+    >>> parse("1 hrs")
+    datetime.timedelta(0, 3600)
     >>> parse("1h")
     datetime.timedelta(0, 3600)
+    >>> parse("1wk")
+    datetime.timedelta(7)
+    >>> parse("1 week")
+    datetime.timedelta(7)
+    >>> parse("1 weeks")
+    datetime.timedelta(7)
+    >>> parse("2 wks")
+    datetime.timedelta(14)
+    >>> parse("1 sec")
+    datetime.timedelta(0, 1)
+    >>> parse("1 secs")
+    datetime.timedelta(0, 1)
+    >>> parse("1 s")
+    datetime.timedelta(0, 1)
+    >>> parse("1 second")
+    datetime.timedelta(0, 1)
+    >>> parse("1 seconds")
+    datetime.timedelta(0, 1)
+    >>> parse("1 minute")
+    datetime.timedelta(0, 60)
+    >>> parse("1 min")
+    datetime.timedelta(0, 60)
+    >>> parse("1 m")
+    datetime.timedelta(0, 60)
+    >>> parse("1 minutes")
+    datetime.timedelta(0, 60)
+    >>> parse("1 mins")
+    datetime.timedelta(0, 60)
+    >>> parse("2 ws")
+    Traceback (most recent call last):
+    ...
+    TypeError: '2 ws' is not a valid time interval
+    >>> parse("2 ds")
+    Traceback (most recent call last):
+    ...
+    TypeError: '2 ds' is not a valid time interval
+    >>> parse("2 hs")
+    Traceback (most recent call last):
+    ...
+    TypeError: '2 hs' is not a valid time interval
+    >>> parse("2 ms")
+    Traceback (most recent call last):
+    ...
+    TypeError: '2 ms' is not a valid time interval
+    >>> parse("2 ss")
+    Traceback (most recent call last):
+    ...
+    TypeError: '2 ss' is not a valid time interval
+    
     """
     # This is the format we get from sometimes Postgres, and from serialization
     d = re.match(r'((?P<days>\d+) days?,? )?(?P<hours>\d+):'
@@ -105,10 +164,10 @@ def parse(string):
     else:
         # This is the more flexible format
         d = re.match(
-                     r'^((?P<weeks>((\d*\.\d+)|\d+))\W*w((ee)?k(s)?)(,)?\W*)?'
+                     r'^((?P<weeks>((\d*\.\d+)|\d+))\W*w((ee)?(k(s)?)?)(,)?\W*)?'
                      r'((?P<days>((\d*\.\d+)|\d+))\W*d(ay(s)?)?(,)?\W*)?'
-                     r'((?P<hours>((\d*\.\d+)|\d+))\W*h(ou)?r?(s)?(,)?\W*)?'
-                     r'((?P<minutes>((\d*\.\d+)|\d+))\W*m(in(ute)?)?(s)?(,)?\W*)?'
+                     r'((?P<hours>((\d*\.\d+)|\d+))\W*h(ou)?(r(s)?)?(,)?\W*)?'
+                     r'((?P<minutes>((\d*\.\d+)|\d+))\W*m(in(ute)?(s)?)?(,)?\W*)?'
                      r'((?P<seconds>((\d*\.\d+)|\d+))\W*s(ec(ond)?(s)?)?)?\W*$',
                      unicode(string))
         if not d:
@@ -123,6 +182,14 @@ def divide(obj1, obj2, as_float=False):
     """
     Allows for the division of timedeltas by other timedeltas, or by
     floats/Decimals
+    
+    >>> from datetime import timedelta as td
+    >>> divide(td(1), td(1))
+    1
+    >>> divide(td(2), td(1))
+    2
+    >>> divide(td(32), 16)
+    datetime.timedelta(2)
     """
     assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
     assert isinstance(obj2, (datetime.timedelta, int, float, Decimal)), "Second argument must be a timedelta or number"
@@ -144,6 +211,14 @@ def divide(obj1, obj2, as_float=False):
 def modulo(obj1, obj2):
     """
     Allows for remainder division of timedelta by timedelta or integer.
+    
+    >>> from datetime import timedelta as td
+    >>> modulo(td(5), td(2))
+    datetime.timedelta(1)
+    >>> modulo(td(6), td(3))
+    datetime.timedelta(0)
+    >>> modulo(td(15), 4 * 3600 * 24)
+    datetime.timedelta(3)
     """
     assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
     assert isinstance(obj2, (datetime.timedelta, int)), "Second argument must be a timedelta or int."
@@ -177,6 +252,8 @@ def decimal_percentage(obj1, obj2):
 def multiply(obj, val):
     """
     Allows for the multiplication of timedeltas by float values.
+    >>> multiply(datetime.timedelta(seconds=20), 1.5)
+    datetime.timedelta(0, 30)
     """
     
     assert isinstance(obj, datetime.timedelta), "First argument must be a timedelta."
@@ -194,6 +271,15 @@ def round_to_nearest(obj, timedelta):
     The obj is rounded to the nearest whole number of timedeltas.
     
     obj can be a timedelta, datetime or time object.
+    
+    >>> round_to_nearest(datetime.datetime(2012, 1, 1, 9, 43), datetime.timedelta(1))
+    datetime.datetime(2012, 1, 1, 0, 0)
+    >>> round_to_nearest(datetime.datetime(2012, 1, 1, 9, 43), datetime.timedelta(hours=1))
+    datetime.datetime(2012, 1, 1, 10, 0)
+    >>> round_to_nearest(datetime.datetime(2012, 1, 1, 9, 43), datetime.timedelta(minutes=15))
+    datetime.datetime(2012, 1, 1, 9, 45)
+    >>> round_to_nearest(datetime.datetime(2012, 1, 1, 9, 43), datetime.timedelta(minutes=1))
+    datetime.datetime(2012, 1, 1, 9, 43)
     """
     
     assert isinstance(obj, (datetime.datetime, datetime.timedelta, datetime.time)), "First argument must be datetime, time or timedelta."
@@ -254,3 +340,6 @@ except AttributeError:
         """
         return timedelta.days * 86400 + timedelta.seconds
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
