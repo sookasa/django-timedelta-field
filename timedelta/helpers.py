@@ -153,6 +153,8 @@ def parse(string):
     Traceback (most recent call last):
     ...
     TypeError: '2 ss' is not a valid time interval
+    >>> parse("")
+    datetime.timedelta(0)
     
     """
     # This is the format we get from sometimes Postgres, and from serialization
@@ -172,10 +174,9 @@ def parse(string):
                      unicode(string))
         if not d:
             raise TypeError("'%s' is not a valid time interval" % string)
-        d = d.groupdict()
+        d = d.groupdict(0)
     
-    return datetime.timedelta(**dict(( (k, float(v)) for k,v in d.items() 
-        if v is not None )))
+    return datetime.timedelta(**dict(( (k, float(v)) for k,v in d.items())))
 
 
 def divide(obj1, obj2, as_float=False):
