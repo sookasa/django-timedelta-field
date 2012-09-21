@@ -28,9 +28,13 @@ class TimedeltaField(models.Field):
             return value
         if isinstance(value, int):
             return datetime.timedelta(seconds=value)
+        if value == "":
+            return None
         return parse(value)
     
     def get_prep_value(self, value):
+        if self.null and value == "":
+            return None
         if (value is None) or isinstance(value, (str, unicode)):
             return value
         return str(value).replace(',', '')
