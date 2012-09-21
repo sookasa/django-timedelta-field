@@ -154,9 +154,13 @@ def parse(string):
     ...
     TypeError: '2 ss' is not a valid time interval
     >>> parse("")
-    datetime.timedelta(0)
+    Traceback (most recent call last):
+    ...
+    TypeError: '' is not a valid time interval
     
     """
+    if string == "":
+        raise TypeError("'%s' is not a valid time interval" % string)
     # This is the format we get from sometimes Postgres, and from serialization
     d = re.match(r'((?P<days>\d+) days?,? )?(?P<hours>\d+):'
                  r'(?P<minutes>\d+)(:(?P<seconds>\d+))?',
