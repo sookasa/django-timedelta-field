@@ -114,6 +114,11 @@ to do this, but it may be useful.
 
 Changelog
 ----------
+0.6.6: Add in a couple of new template filters: total_seconds, and total_seconds_sort.
+       The latter zero-pads the value to 10 places, ideal for lexical sorting.
+       This correctly sorts timedeltas of up to around 10 years, if you need more
+       you can pass an argument to the filter.
+
 0.6.5: Empty string values in database now are returned as None for the field value.
        Note that you must have field.null=True to store a NULL in the db.
        I'm still not 100% happy with this: postgres may choke on empty string values when doing INTERVAL comparisons.
