@@ -21,14 +21,10 @@ class TimedeltaFormField(forms.Field):
         super(TimedeltaFormField, self).clean(value)
         if value == '' and not self.required:
             return u''
-        
-        data = defaultdict(float)
         try:
             return parse(value)
         except TypeError:
             raise forms.ValidationError(self.error_messages['invalid'])
-            
-        return datetime.timedelta(**data)
 
 class TimedeltaChoicesField(TimedeltaFormField):
     def __init__(self, *args, **kwargs):
