@@ -7,7 +7,7 @@ class TimedeltaWidget(forms.TextInput):
     def __init__(self, *args, **kwargs):
         return super(TimedeltaWidget, self).__init__(*args, **kwargs)
         
-    def render(self, name, value, attrs):
+    def render(self, name, value, attrs=None):
         if value is None:
             value = ""
         elif isinstance(value, (str, unicode)):
