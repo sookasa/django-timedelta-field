@@ -114,6 +114,8 @@ to do this, but it may be useful.
 
 Changelog
 ----------
+0.6.7: Added LICENSE file.
+
 0.6.6: Add in a couple of new template filters: total_seconds, and total_seconds_sort.
        The latter zero-pads the value to 10 places, ideal for lexical sorting.
        This correctly sorts timedeltas of up to around 10 years, if you need more
