@@ -161,9 +161,10 @@ def parse(string):
     """
     if string == "":
         raise TypeError("'%s' is not a valid time interval" % string)
-    # This is the format we get from sometimes Postgres, and from serialization
+    # This is the format we get from sometimes Postgres, sqlite,
+    # and from serialization
     d = re.match(r'((?P<days>\d+) days?,? )?(?P<hours>\d+):'
-                 r'(?P<minutes>\d+)(:(?P<seconds>\d+))?',
+                 r'(?P<minutes>\d+)(:(?P<seconds>[\.\d]+))?',
                  unicode(string))
     if d: 
         d = d.groupdict(0)
