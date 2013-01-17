@@ -164,7 +164,7 @@ def parse(string):
     # This is the format we get from sometimes Postgres, sqlite,
     # and from serialization
     d = re.match(r'((?P<days>\d+) days?,? )?(?P<hours>\d+):'
-                 r'(?P<minutes>\d+)(:(?P<seconds>[\.\d]+))?',
+                 r'(?P<minutes>\d+)(:(?P<seconds>\d+(\.\d+)?))?',
                  unicode(string))
     if d: 
         d = d.groupdict(0)
