@@ -1,6 +1,11 @@
+from django.db import models
+from django.core.exceptions import ValidationError
 from unittest import TestCase
+
 import datetime
+
 from forms import TimedeltaFormField
+from fields import TimedeltaField
 from widgets import TimedeltaWidget
 from helpers import *
 
@@ -35,6 +40,39 @@ class TimedeltaWidgetTest(TestCase):
         >>> t.render('', datetime.timedelta(seconds=302400), {})
         u'<input type="text" name="" value="3 days, 12 hours" />'
         """
+
+class MinMaxTestModel(models.Model):
+    min = TimedeltaField(min_value=datetime.timedelta(1))
+    max = TimedeltaField(max_value=datetime.timedelta(1))
+    minmax = TimedeltaField(min_value=datetime.timedelta(1), max_value=datetime.timedelta(7))
+    
+class TimedeltaModelFieldTest(TestCase):
+    def test_validate(self):
+        test = MinMaxTestModel(
+            min=datetime.timedelta(1),
+            max=datetime.timedelta(1),
+            minmax=datetime.timedelta(1)
+        )
+        test.full_clean() # This should have met validation requirements.
+        
+        test.min = datetime.timedelta(hours=23)
+        self.assertRaises(ValidationError, test.full_clean)
+        
+        test.min = datetime.timedelta(hours=25)
+        test.full_clean()
+        
+        test.max = datetime.timedelta(11)
+        self.assertRaises(ValidationError, test.full_clean)
+        
+        test.max = datetime.timedelta(hours=20)
+        test.full_clean()
+        
+        test.minmax = datetime.timedelta(0)
+        self.assertRaises(ValidationError, test.full_clean)
+        test.minmax = datetime.timedelta(22)
+        self.assertRaises(ValidationError, test.full_clean)
+        test.minmax = datetime.timedelta(6, hours=23, minutes=59, seconds=59)
+        test.full_clean()
 
 class TimedeltaFormFieldTest(TestCase):
     def test_clean(self):
@@ -93,6 +131,7 @@ class TimedeltaFormFieldTest(TestCase):
         Traceback (most recent call last):
         ValidationError: [u'Enter a valid time span: e.g. "3 days, 4 hours, 2 minutes"']
         """
+    
 
 class TimedeltaHelpersTest(TestCase):
     def test_parse(self):

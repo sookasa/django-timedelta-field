@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from collections import defaultdict
 import datetime
@@ -22,6 +23,11 @@ class TimedeltaField(models.Field):
     _south_introspects = True
     
     description = "A datetime.timedelta object"
+    
+    def __init__(self, *args, **kwargs):
+        self._min_value = kwargs.pop('min_value', None)
+        self._max_value = kwargs.pop('max_value', None)
+        super(TimedeltaField, self).__init__(*args, **kwargs)
     
     def to_python(self, value):
         if (value is None) or isinstance(value, datetime.timedelta):
@@ -49,6 +55,15 @@ class TimedeltaField(models.Field):
         defaults = {'form_class':TimedeltaFormField}
         defaults.update(kwargs)
         return super(TimedeltaField, self).formfield(*args, **defaults)
+    
+    def validate(self, value, model_instance):
+        super(TimedeltaField, self).validate(value, model_instance)
+        if self._min_value is not None:
+            if self._min_value > value:
+                raise ValidationError('Less than minimum allowed value')
+        if self._max_value is not None:
+            if self._max_value < value:
+                raise ValidationError('More than maximum allowed value')
     
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
