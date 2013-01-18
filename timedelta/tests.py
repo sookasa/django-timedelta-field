@@ -48,6 +48,9 @@ class TimedeltaFormFieldTest(TestCase):
         datetime.timedelta(1, 31362, 342000)
         >>> t.clean('3 days, 8:42:42.342161')
         datetime.timedelta(3, 31362, 342161)
+        >>> t.clean('3 days, 8:42:42.3.42161')
+        Traceback (most recent call last):
+        ValidationError: [u'Enter a valid time span: e.g. "3 days, 4 hours, 2 minutes"']
         >>> t.clean('5 day, 8:42:42')
         datetime.timedelta(5, 31362)
         >>> t.clean('1 days')
