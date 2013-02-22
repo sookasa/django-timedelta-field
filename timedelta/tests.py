@@ -4,10 +4,10 @@ from unittest import TestCase
 
 import datetime
 
-from forms import TimedeltaFormField
-from fields import TimedeltaField
-from widgets import TimedeltaWidget
-from helpers import *
+from .forms import TimedeltaFormField
+from .fields import TimedeltaField
+from .widgets import TimedeltaWidget
+from .helpers import *
 
 class TimedeltaWidgetTest(TestCase):
     def test_render(self):

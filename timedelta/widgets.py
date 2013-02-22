@@ -1,7 +1,7 @@
 from django import forms
 import datetime
 
-from helpers import nice_repr, parse
+from .helpers import nice_repr, parse
 
 class TimedeltaWidget(forms.TextInput):
     def __init__(self, *args, **kwargs):
