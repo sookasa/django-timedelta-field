@@ -2,9 +2,10 @@ from django.db import models
 
 from collections import defaultdict
 import datetime
+import six
 
-from helpers import parse
-from forms import TimedeltaFormField
+from .helpers import parse
+from .forms import TimedeltaFormField
 
 # TODO: Figure out why django admin thinks fields of this type have changed every time an object is saved.
 
@@ -38,7 +39,7 @@ class TimedeltaField(models.Field):
     def get_prep_value(self, value):
         if self.null and value == "":
             return None
-        if (value is None) or isinstance(value, (str, unicode)):
+        if (value is None) or isinstance(value, six.string_types):
             return value
         return str(value).replace(',', '')
         

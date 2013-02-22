@@ -13,6 +13,9 @@ setup(
         "timedelta",
         "timedelta.templatetags",
     ],
+    install_requires = [
+        "six",
+    ],
     package_data = {'timedelta': ['VERSION']},
     classifiers = [
         'Programming Language :: Python',

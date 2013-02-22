@@ -1,7 +1,8 @@
 from django import forms
 import datetime
+import six
 
-from helpers import nice_repr, parse
+from .helpers import nice_repr, parse
 
 class TimedeltaWidget(forms.TextInput):
     def __init__(self, *args, **kwargs):
@@ -10,7 +11,7 @@ class TimedeltaWidget(forms.TextInput):
     def render(self, name, value, attrs=None):
         if value is None:
             value = ""
-        elif isinstance(value, (str, unicode)):
+        elif isinstance(value, six.string_types):
             pass
         else:
             if isinstance(value, int):
