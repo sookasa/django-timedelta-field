@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 
 from collections import defaultdict
 import datetime
+import six
 
 from .helpers import parse
 from .forms import TimedeltaFormField
@@ -44,7 +45,7 @@ class TimedeltaField(models.Field):
     def get_prep_value(self, value):
         if self.null and value == "":
             return None
-        if (value is None) or isinstance(value, (str, unicode)):
+        if (value is None) or isinstance(value, six.string_types):
             return value
         return str(value).replace(',', '')
         
