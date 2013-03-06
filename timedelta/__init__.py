@@ -5,7 +5,7 @@ __version__ = open(os.path.join(os.path.dirname(__file__), "VERSION")).read().st
 try:
     from django.core.exceptions import ImproperlyConfigured
 except ImportError:
-    ImproperlyConfigured = None
+    ImproperlyConfigured = ImportError
 
 try:
     from .fields import TimedeltaField
