@@ -4,8 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 import datetime
 from collections import defaultdict
 
-from widgets import TimedeltaWidget
-from helpers import parse
+from .widgets import TimedeltaWidget
+from .helpers import parse
 
 class TimedeltaFormField(forms.Field):
     default_error_messages = {
