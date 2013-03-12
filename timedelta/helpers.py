@@ -2,6 +2,8 @@ import re
 import datetime
 from decimal import Decimal
 
+import six
+
 def nice_repr(timedelta, display="long", sep=", "):
     """
     Turns a datetime.timedelta object into a nice string repr.
@@ -165,7 +167,7 @@ def parse(string):
     # and from serialization
     d = re.match(r'^((?P<days>\d+) days?,? )?(?P<hours>\d+):'
                  r'(?P<minutes>\d+)(:(?P<seconds>\d+(\.\d+)?))?$',
-                 unicode(string))
+                 six.text_type(string))
     if d: 
         d = d.groupdict(0)
     else:
@@ -176,7 +178,7 @@ def parse(string):
                      r'((?P<hours>((\d*\.\d+)|\d+))\W*h(ou)?(r(s)?)?(,)?\W*)?'
                      r'((?P<minutes>((\d*\.\d+)|\d+))\W*m(in(ute)?(s)?)?(,)?\W*)?'
                      r'((?P<seconds>((\d*\.\d+)|\d+))\W*s(ec(ond)?(s)?)?)?\W*$',
-                     unicode(string))
+                     six.text_type(string))
         if not d:
             raise TypeError("'%s' is not a valid time interval" % string)
         d = d.groupdict(0)
