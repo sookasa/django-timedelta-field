@@ -1,6 +1,8 @@
 django-timedelta-field
 ==========================
 
+.. image:: https://drone.io/bitbucket.org/schinckel/django-timedelta-field/status.png
+
 PostgreSQL can store data as INTERVAL type, which is close to meaning the
 same as python's timedelta object (although better in a couple of ways).
 
