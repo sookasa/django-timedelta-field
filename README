@@ -116,6 +116,27 @@ to do this, but it may be useful.
 
 Changelog
 ----------
+
+0.7.0: Support for django 1.5
+
+0.6.7: Added LICENSE file.
+
+0.6.6: Add in a couple of new template filters: total_seconds, and total_seconds_sort.
+       The latter zero-pads the value to 10 places, ideal for lexical sorting.
+       This correctly sorts timedeltas of up to around 10 years, if you need more
+       you can pass an argument to the filter.
+
+0.6.5: Empty string values in database now are returned as None for the field value.
+       Note that you must have field.null=True to store a NULL in the db.
+       I'm still not 100% happy with this: postgres may choke on empty string values when doing INTERVAL comparisons.
+       Thanks to Gustavo Dias jaimes and reidpr for the report/fix.
+
+0.6.4: Correctly parse '1w' (previously required 1wk).
+       Don't parse things like '1 hs', require '1 hrs'.
+       Test a bit harder.
+
+0.6.3: Correctly parse '1h' as one hour (previously required 1hr).
+
 0.6.2: Remember to include VERSION number.
 
 0.6.0: Added total_seconds helper (for python < 2.7)

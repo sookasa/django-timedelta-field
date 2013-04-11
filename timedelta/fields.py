@@ -1,10 +1,11 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from collections import defaultdict
 import datetime
 
-from helpers import parse
-from forms import TimedeltaFormField
+from .helpers import parse
+from .forms import TimedeltaFormField
 
 # TODO: Figure out why django admin thinks fields of this type have changed every time an object is saved.
 
@@ -23,16 +24,26 @@ class TimedeltaField(models.Field):
     
     description = "A datetime.timedelta object"
     
+    def __init__(self, *args, **kwargs):
+        self._min_value = kwargs.pop('min_value', None)
+        self._max_value = kwargs.pop('max_value', None)
+        super(TimedeltaField, self).__init__(*args, **kwargs)
+    
     def to_python(self, value):
         if (value is None) or isinstance(value, datetime.timedelta):
             return value
         if isinstance(value, int):
             return datetime.timedelta(seconds=value)
         if value == "":
-            return datetime.timedelta(0)
+            if self.null:
+                return None
+            else:
+                return datetime.timedelta(0)
         return parse(value)
     
     def get_prep_value(self, value):
+        if self.null and value == "":
+            return None
         if (value is None) or isinstance(value, (str, unicode)):
             return value
         return str(value).replace(',', '')
@@ -44,6 +55,15 @@ class TimedeltaField(models.Field):
         defaults = {'form_class':TimedeltaFormField}
         defaults.update(kwargs)
         return super(TimedeltaField, self).formfield(*args, **defaults)
+    
+    def validate(self, value, model_instance):
+        super(TimedeltaField, self).validate(value, model_instance)
+        if self._min_value is not None:
+            if self._min_value > value:
+                raise ValidationError('Less than minimum allowed value')
+        if self._max_value is not None:
+            if self._max_value < value:
+                raise ValidationError('More than maximum allowed value')
     
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
