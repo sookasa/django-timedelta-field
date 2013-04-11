@@ -1,9 +1,9 @@
-from distutils.core import setup
-from timedelta import __version__
+import os.path
+from setuptools import setup
 
 setup(
     name = "django-timedeltafield",
-    version = __version__,
+    version = open(os.path.join(os.path.dirname(__file__), 'timedelta', 'VERSION')).read().strip(),
     description = "TimedeltaField for django models",
     long_description = open("README").read(),
     url = "http://hg.schinckel.net/django-timedelta-field/",
@@ -20,4 +20,5 @@ setup(
         'Operating System :: OS Independent',
         'Framework :: Django',
     ],
+    test_suite='tests.main',
 )
