@@ -15,12 +15,11 @@ COLUMN_TYPES = defaultdict(lambda:"char(20)")
 COLUMN_TYPES["django.db.backends.postgresql_psycopg2"] = "interval"
 COLUMN_TYPES["django.contrib.gis.db.backends.postgis"] = "interval"
 
-class TimedeltaField(models.Field):
+class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """
     Store a datetime.timedelta as an INTERVAL in postgres, or a 
     CHAR(20) in other database backends.
     """
-    __metaclass__ = models.SubfieldBase
     _south_introspects = True
     
     description = "A datetime.timedelta object"
