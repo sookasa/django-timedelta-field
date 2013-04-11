@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils import six
+
 from unittest import TestCase
 
 import datetime
@@ -9,37 +11,41 @@ from .fields import TimedeltaField
 from .widgets import TimedeltaWidget
 from .helpers import *
 
+UNICODE = {
+    'u': '' if six.PY3 else 'u'
+}
+
 class TimedeltaWidgetTest(TestCase):
     def test_render(self):
         """
         >>> t = TimedeltaWidget()
         >>> t.render('', datetime.timedelta(days=1), {})
-        u'<input type="text" name="" value="1 day" />'
+        %(u)s'<input type="text" name="" value="1 day" />'
         >>> t.render('', datetime.timedelta(days=0), {})
-        u'<input type="text" name="" />'
+        %(u)s'<input type="text" name="" />'
         >>> t.render('', datetime.timedelta(seconds=1), {})
-        u'<input type="text" name="" value="1 second" />'
+        %(u)s'<input type="text" name="" value="1 second" />'
         >>> t.render('', datetime.timedelta(seconds=10), {})
-        u'<input type="text" name="" value="10 seconds" />'
+        %(u)s'<input type="text" name="" value="10 seconds" />'
         >>> t.render('', datetime.timedelta(seconds=30), {})
-        u'<input type="text" name="" value="30 seconds" />'
+        %(u)s'<input type="text" name="" value="30 seconds" />'
         >>> t.render('', datetime.timedelta(seconds=60), {})
-        u'<input type="text" name="" value="1 minute" />'
+        %(u)s'<input type="text" name="" value="1 minute" />'
         >>> t.render('', datetime.timedelta(seconds=150), {})
-        u'<input type="text" name="" value="2 minutes, 30 seconds" />'
+        %(u)s'<input type="text" name="" value="2 minutes, 30 seconds" />'
         >>> t.render('', datetime.timedelta(seconds=1800), {})
-        u'<input type="text" name="" value="30 minutes" />'
+        %(u)s'<input type="text" name="" value="30 minutes" />'
         >>> t.render('', datetime.timedelta(seconds=3600), {})
-        u'<input type="text" name="" value="1 hour" />'
+        %(u)s'<input type="text" name="" value="1 hour" />'
         >>> t.render('', datetime.timedelta(seconds=3601), {})
-        u'<input type="text" name="" value="1 hour, 1 second" />'
+        %(u)s'<input type="text" name="" value="1 hour, 1 second" />'
         >>> t.render('', datetime.timedelta(seconds=19800), {})
-        u'<input type="text" name="" value="5 hours, 30 minutes" />'
+        %(u)s'<input type="text" name="" value="5 hours, 30 minutes" />'
         >>> t.render('', datetime.timedelta(seconds=91800), {})
-        u'<input type="text" name="" value="1 day, 1 hour, 30 minutes" />'
+        %(u)s'<input type="text" name="" value="1 day, 1 hour, 30 minutes" />'
         >>> t.render('', datetime.timedelta(seconds=302400), {})
-        u'<input type="text" name="" value="3 days, 12 hours" />'
-        """
+        %(u)s'<input type="text" name="" value="3 days, 12 hours" />'
+        """ % UNICODE
 
 class MinMaxTestModel(models.Model):
     min = TimedeltaField(min_value=datetime.timedelta(1))
@@ -88,7 +94,7 @@ class TimedeltaFormFieldTest(TestCase):
         datetime.timedelta(3, 31362, 342161)
         >>> t.clean('3 days, 8:42:42.3.42161')
         Traceback (most recent call last):
-        ValidationError: [u'Enter a valid time span: e.g. "3 days, 4 hours, 2 minutes"']
+        ValidationError: ['Enter a valid time span: e.g. "3 days, 4 hours, 2 minutes"']
         >>> t.clean('5 day, 8:42:42')
         datetime.timedelta(5, 31362)
         >>> t.clean('1 days')
@@ -127,10 +133,11 @@ class TimedeltaFormFieldTest(TestCase):
         datetime.timedelta(7)
         >>> t.clean('2 weeks, 2 days')
         datetime.timedelta(16)
-        >>> t.clean(u'2 we\xe8k, 2 days')
+        >>> t.clean(six.u('2 we\xe8k, 2 days'))
         Traceback (most recent call last):
-        ValidationError: [u'Enter a valid time span: e.g. "3 days, 4 hours, 2 minutes"']
-        """
+            ...
+        ValidationError: [%(u)s'Enter a valid time span: e.g. "3 days, 4 hours, 2 minutes"']
+        """ % UNICODE
     
 
 class TimedeltaHelpersTest(TestCase):

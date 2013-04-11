@@ -1,6 +1,10 @@
+from __future__ import division
+
 import re
 import datetime
 from decimal import Decimal
+
+from django.utils import six
 
 def nice_repr(timedelta, display="long", sep=", "):
     """
@@ -19,10 +23,10 @@ def nice_repr(timedelta, display="long", sep=", "):
     
     result = []
     
-    weeks = timedelta.days / 7
+    weeks = int(timedelta.days / 7)
     days = timedelta.days % 7
-    hours = timedelta.seconds / 3600
-    minutes = (timedelta.seconds % 3600) / 60
+    hours = int(timedelta.seconds / 3600)
+    minutes = int((timedelta.seconds % 3600) / 60)
     seconds = timedelta.seconds % 60
     
     if display == "sql":
@@ -55,12 +59,12 @@ def iso8601_repr(timedelta):
     >>> iso8601_repr(td(days=1, hours=2, minutes=3, seconds=4))
     'P1DT2H3M4S'
     """
-    years = timedelta.days / 365
-    weeks = (timedelta.days % 365) / 7
+    years = int(timedelta.days / 365)
+    weeks = int((timedelta.days % 365) / 7)
     days = timedelta.days % 7
 
-    hours = timedelta.seconds / 3600
-    minutes = (timedelta.seconds % 3600) / 60
+    hours = int(timedelta.seconds / 3600)
+    minutes = int((timedelta.seconds % 3600) / 60)
     seconds = timedelta.seconds % 60
 
     formatting = (
@@ -165,7 +169,7 @@ def parse(string):
     # and from serialization
     d = re.match(r'^((?P<days>\d+) days?,? )?(?P<hours>\d+):'
                  r'(?P<minutes>\d+)(:(?P<seconds>\d+(\.\d+)?))?$',
-                 unicode(string))
+                 six.text_type(string))
     if d: 
         d = d.groupdict(0)
     else:
@@ -176,7 +180,7 @@ def parse(string):
                      r'((?P<hours>((\d*\.\d+)|\d+))\W*h(ou)?(r(s)?)?(,)?\W*)?'
                      r'((?P<minutes>((\d*\.\d+)|\d+))\W*m(in(ute)?(s)?)?(,)?\W*)?'
                      r'((?P<seconds>((\d*\.\d+)|\d+))\W*s(ec(ond)?(s)?)?)?\W*$',
-                     unicode(string))
+                     six.text_type(string))
         if not d:
             raise TypeError("'%s' is not a valid time interval" % string)
         d = d.groupdict(0)
@@ -203,9 +207,10 @@ def divide(obj1, obj2, as_float=False):
     sec1 = obj1.days * 86400 + obj1.seconds
     if isinstance(obj2, datetime.timedelta):
         sec2 = obj2.days * 86400 + obj2.seconds
+        value = sec1 / sec2
         if as_float:
-            sec1 *= 1.0
-        return sec1 / sec2
+            return value
+        return int(value)
     else:
         if as_float:
             assert None, "as_float=True is inappropriate when dividing timedelta by a number."

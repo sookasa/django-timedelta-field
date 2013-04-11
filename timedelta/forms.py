@@ -20,7 +20,7 @@ class TimedeltaFormField(forms.Field):
     def clean(self, value):
         super(TimedeltaFormField, self).clean(value)
         if value == '' and not self.required:
-            return u''
+            return ''
         try:
             return parse(value)
         except TypeError:
