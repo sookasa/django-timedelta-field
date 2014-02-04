@@ -117,6 +117,9 @@ to do this, but it may be useful.
 Changelog
 ----------
 
+0.7.1: Allow using arbitrary php-style strings in the timedelta template
+			 tag argument. Like django's date and time filters.
+
 0.7.0: Support for django 1.5
 
 0.6.7: Added LICENSE file.
