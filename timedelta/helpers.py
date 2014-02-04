@@ -6,7 +6,7 @@ from decimal import Decimal
 
 from django.utils import six
 
-STRFDATETIME = re.compile('([dgGhHisu])')
+STRFDATETIME = re.compile('([dgGhHis])')
 STRFDATETIME_REPL = lambda x: '%%(%s)s' % x.group()
 
 def nice_repr(timedelta, display="long", sep=", "):
@@ -70,7 +70,7 @@ def nice_repr(timedelta, display="long", sep=", "):
     else:
         # Use django template-style formatting.
         # Valid values are:
-        # d,g,G,h,H,i,s,u
+        # d,g,G,h,H,i,s
         return STRFDATETIME.sub(STRFDATETIME_REPL, display) % {
             'd': days,
             'g': hours,
