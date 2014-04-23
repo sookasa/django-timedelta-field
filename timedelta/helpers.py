@@ -6,6 +6,9 @@ from decimal import Decimal
 
 from django.utils import six
 
+STRFDATETIME = re.compile('([dgGhHisu])')
+STRFDATETIME_REPL = lambda x: '%%(%s)s' % x.group()
+
 def nice_repr(timedelta, display="long", sep=", "):
     """
     Turns a datetime.timedelta object into a nice string repr.
@@ -62,8 +65,21 @@ def nice_repr(timedelta, display="long", sep=", "):
         words = ["w", "d", "h", "m", "s"]
     elif display == 'short':
         words = [" wks", " days", " hrs", " min", " sec"]
-    else:
+    elif display == 'long':
         words = [" weeks", " days", " hours", " minutes", " seconds"]
+    else:
+        # Use django template-style formatting.
+        # Valid values are:
+        # d,g,G,h,H,i,s,u
+        return STRFDATETIME.sub(STRFDATETIME_REPL, display) % {
+            'd': days,
+            'g': hours,
+            'G': hours if hours > 9 else '0%s' % hours,
+            'h': hours,
+            'H': hours if hours > 9 else '0%s' % hours,
+            'i': minutes if minutes > 9 else '0%s' % minutes,
+            's': seconds if seconds > 9 else '0%s' % seconds
+        }
     
     values = [weeks, days, hours, minutes, seconds]
     
