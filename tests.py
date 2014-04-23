@@ -4,7 +4,7 @@ import unittest
 import doctest
 import django
 
-BASE_PATH = os.path.dirname(__file__) + 'timedelta/'
+BASE_PATH = os.path.dirname(__file__)
 
 def main(db_engine='sqlite3'):
     """
@@ -19,6 +19,7 @@ def main(db_engine='sqlite3'):
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'timedelta',
+        'django_coverage',
     )
     global_settings.DATABASES = {
         'default': {
@@ -32,10 +33,15 @@ def main(db_engine='sqlite3'):
     global_settings.STATIC_ROOT = global_settings.MEDIA_ROOT
     
     global_settings.SECRET_KEY = '334ebe58-a77d-4321-9d01-a7d2cb8d3eea'
-    global_settings.TEST_RUNNER = 'django_coverage.coverage_runner.CoverageRunner'
+    global_settings.COVERAGE_REPORT_HTML_OUTPUT_DIR = os.path.join(BASE_PATH, '.coverage')
+    global_settings.COVERAGE_USE_STDOUT = True
     
-    from django.test.utils import get_runner
-    test_runner = get_runner(global_settings)
+    if os.environ.get('COVERAGE', None):
+        from django_coverage import coverage_runner
+        test_runner = coverage_runner.CoverageRunner
+    else:
+        from django.test.utils import get_runner
+        test_runner = get_runner(global_settings)
 
     test_runner = test_runner()
     failures = test_runner.run_tests(['timedelta'])
