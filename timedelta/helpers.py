@@ -23,7 +23,7 @@ def nice_repr(timedelta, display="long", sep=", "):
     >>> nice_repr(datetime.timedelta(days=1))
     '1 day'
     >>> nice_repr(datetime.timedelta(days=0))
-    ''
+    '0 seconds'
     >>> nice_repr(datetime.timedelta(seconds=1))
     '1 second'
     >>> nice_repr(datetime.timedelta(seconds=10))
@@ -46,6 +46,14 @@ def nice_repr(timedelta, display="long", sep=", "):
     '1 day, 1 hour, 30 minutes'
     >>> nice_repr(datetime.timedelta(seconds=302400))
     '3 days, 12 hours'
+
+    Tests for handling zero:
+    >>> nice_repr(td(seconds=0), 'minimal')
+    '0s'
+    >>> nice_repr(td(seconds=0), 'short')
+    '0 sec'
+    >>> nice_repr(td(seconds=0), 'long')
+    '0 seconds'
     """
     
     assert isinstance(timedelta, datetime.timedelta), "First argument must be a timedelta."
@@ -89,8 +97,14 @@ def nice_repr(timedelta, display="long", sep=", "):
                 result.append("%i%s" % (values[i], words[i].rstrip('s')))
             else:
                 result.append("%i%s" % (values[i], words[i]))
+
+    # values with less than one second, which are considered zeroes
+    if len(result) == 0:
+        # display as 0 of the smallest unit
+        result.append('0%s' % (words[-1]))
     
     return sep.join(result)
+
 
 def iso8601_repr(timedelta):
     """
@@ -226,6 +240,21 @@ def parse(string):
     datetime.timedelta(-2, 82739)
     >>> parse("-1 weeks, 2 days, -3 hours, 4 minutes, -5 seconds")
     datetime.timedelta(-5, 11045)
+
+    >>> parse("0 seconds")
+    datetime.timedelta(0)
+    >>> parse("0 days")
+    datetime.timedelta(0)
+    >>> parse("0 weeks")
+    datetime.timedelta(0)
+
+    >>> zero = datetime.timedelta(0)
+    >>> parse(nice_repr(zero))
+    datetime.timedelta(0)
+    >>> parse(nice_repr(zero, 'minimal'))
+    datetime.timedelta(0)
+    >>> parse(nice_repr(zero, 'short'))
+    datetime.timedelta(0)
     """
     if string == "":
         raise TypeError("'%s' is not a valid time interval" % string)
