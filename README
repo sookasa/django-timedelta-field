@@ -117,6 +117,9 @@ to do this, but it may be useful.
 Changelog
 ----------
 
+0.7.2: Make nice_repr behave in a more meaningful way with timedelta(0).
+			 Thanks to Andy Evan for the report, and Jake Teton-Landis for the fix.
+
 0.7.1: Allow using arbitrary php-style strings in the timedelta template
 			 tag argument. Like django's date and time filters.
 
