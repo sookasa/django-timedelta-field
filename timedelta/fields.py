@@ -85,4 +85,11 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
     def db_type(self, connection):
         return COLUMN_TYPES[connection.settings_dict['ENGINE']]
 
-
+    def deconstruct(self):
+        return (
+            self.name, 'timedelta.fields.TimedeltaField',
+            (), {
+                'min_value': self.min_value, 
+                'max_value': self.max_value
+            }
+        )
