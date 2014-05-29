@@ -36,6 +36,11 @@ class TimedeltaWidget(forms.TextInput):
                 initial = parse(initial)
 
         if not isinstance(data, datetime.timedelta):
-            data = parse(data)
+            try:
+                data = parse(data)
+            except TypeError:
+                # initial didn't throw a TypeError, so this must be different
+                # from initial
+                return True
         
         return initial != data
