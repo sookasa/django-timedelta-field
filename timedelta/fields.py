@@ -89,7 +89,7 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
         return (
             self.name, 'timedelta.fields.TimedeltaField',
             (), {
-                'min_value': self.min_value, 
-                'max_value': self.max_value
+                'min_value': self._min_value, 
+                'max_value': self._max_value
             }
         )
