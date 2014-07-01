@@ -1,4 +1,7 @@
+syntax: glob
 MANIFEST
 dist/
+*.egg-info/
 .tox
 .coverage/
+*.pyc

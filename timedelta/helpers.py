@@ -114,6 +114,9 @@ def iso8601_repr(timedelta, format=None):
     >>> from datetime import timedelta as td
     >>> iso8601_repr(td(days=1, hours=2, minutes=3, seconds=4))
     'P1DT2H3M4S'
+
+    >>> iso8601_repr(td(hours=1, minutes=10, seconds=20), 'alt')
+    'PT01:10:20'
     """
     years = int(timedelta.days / 365)
     weeks = int((timedelta.days % 365) / 7)
@@ -126,7 +129,7 @@ def iso8601_repr(timedelta, format=None):
     if format == 'alt':
         if years or weeks or days:
             raise ValueError('Does not support alt format for durations > 1 day')
-        return 'PT{0:02d}:{0:02d}:{0:02d}'.format(hours, minutes, seconds)
+        return 'PT{0:02d}:{1:02d}:{2:02d}'.format(hours, minutes, seconds)
 
     formatting = (
         ('P', (
