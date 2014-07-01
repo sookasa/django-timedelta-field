@@ -12,7 +12,7 @@ combines the two:
 
     * a timedelta.TimedeltaField() object that transparently converts
       to and from datetime.timedelta
-    
+
     * storage of the data as an INTERVAL in PostgreSQL, or a string in
       other databases. (Other databases will be considered if I ever
       use them, or receive patches).
@@ -30,7 +30,7 @@ To use, install the package, and use the field::
 
     from django.db import models
     import timedelta
-    
+
     class MyModel(models.Model):
         the_timedelta = timedelta.fields.TimedeltaField()
 
@@ -47,11 +47,11 @@ Event model::
 
     from django.db import models
     import timedelta
-    
+
     class Event(models.Model):
         start = models.DateTimeField()
         duration = timedelta.fields.TimedeltaField()
-        
+
         @property
         def finish(self):
             return self.start + self.duration
@@ -63,20 +63,20 @@ Storing data within the field::
         duration=datetime.timedelta(hours=1)
     )
     print evt.finish
-    
+
     evt.duration = datetime.timedelta(minutes=3)
     print evt.finish
-    
+
     # We can use valid strings of the format described above.
     Event.objects.update(duration='2 hours, 45 minutes')
-    
+
     evt = Event.objects.get(pk=evt.pk)
     print evt.finish
-    
+
     # We can also assign directly to this field a valid string.
     evt.duration = '3 days, 2 hours'
     evt.save()
-    
+
     # Note: we need to re-fetch to ensure conversion to timedelta
     evt = Event.objects.get(pk=evt.pk)
     print evt.finish
@@ -84,7 +84,7 @@ Storing data within the field::
 Using with a form.
 ~~~~~~~~~~~~~~~~~~~~
 
-You can just use a ModelForm, and it will automatically select the 
+You can just use a ModelForm, and it will automatically select the
 ``TimedeltaFormField``, which will handle the conversion between
 formatted strings and timedelta objects.
 
@@ -92,7 +92,7 @@ Or you may use the form field directly::
 
     from django import forms
     import timedelta
-    
+
     class EventForm(forms.Form):
         start = forms.DateTimeField()
         duration = timedelta.forms.TimedeltaFormField()
@@ -106,16 +106,83 @@ And will parse data from a similar format.
 Have a look in tests.py for examples of the form field/widget output.
 
 
+Helpers
+-------
+
+``nice_repr(timedelta, display='long', sep=', ')``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns a string of the format:
+
+    "2 weeks, 7 hours, 1 day"
+
+``display`` may be one of the strings 'minimal', 'short' or 'long'.
+
+``iso8601_repr(timedelta, format=None)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns a string of the format:
+
+    "P2WT7H1D"
+
+As per ISO8601. For timedeltas less than a whole day, the 'alt' format is supported:
+
+    "PT01:02:03"
+
+
+``parse(string)``
+~~~~~~~~~~~~~~~~~
+Parse a string from the ``nice_repr`` formats.
+
+
+``divide(timedelta, other)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Allow dividing one timedelta by another, or by an integer, float or decimal value.
+
+
+``modulo(timedelta, other)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Allows modulo division of one timedelta by another, or by an integer.
+
+``percentage(timedelta, timedelta)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Returns what percentage of the first timedelta the second is, as a float.
+
+``decimal_percentag(timedelta, timedelta)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Returns what percentage of the first timedelta the second is, as a decimal.
+
+
+``multiply(timedelta, other)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Allows for the multiplication of timedeltas by numbers.
+
+``round_to_nearest(obj, timedelta)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Round the first argument (which must be a datetime, time, or timedelta object), to the nearest interval of the second argument.
+
+``decimal_hours(timedelta)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Return a decimal value of the number of hours that this timedelta object refers to.
+
+``total_seconds(timedelta)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A wrapper for python < 2.7's lack of ``timedelta.total_seconds()``
+
 Todo
 -------------
 
-Parse ISO8601 strings. Thanks to Guillame Libersat, we can generate them. 
+Parse ISO8601 strings. Thanks to Guillame Libersat, we can generate them.
 
 Handle strings with times in other languages. I'm not really sure about how
 to do this, but it may be useful.
 
 Changelog
 ----------
+
+0.7.3: Bugfixes/more testing.
+       Add alternative format for ISO8601 display: PT00:15:00, for instance.
+			 Note that values > timedelta(1) may not be displayed in this manner.
 
 0.7.2: Make nice_repr behave in a more meaningful way with timedelta(0).
 			 Thanks to Andy Evan for the report, and Jake Teton-Landis for the fix.
@@ -156,7 +223,7 @@ Changelog
 0.5: Feature from Guillaume Libersat: helper and template for ISO8601 representation.
      Bugfix from croepha: allow for non-plural 'days' string.
      Bugfix from Guillaume Libersat: don't explode if initial is None
-     
+
 
 0.4.7: Bugfix from savemu: use unicode() instead of str()
 
