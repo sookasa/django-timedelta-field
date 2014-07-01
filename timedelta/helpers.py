@@ -12,9 +12,9 @@ STRFDATETIME_REPL = lambda x: '%%(%s)s' % x.group()
 def nice_repr(timedelta, display="long", sep=", "):
     """
     Turns a datetime.timedelta object into a nice string repr.
-    
+
     display can be "minimal", "short" or "long" [default].
-    
+
     >>> from datetime import timedelta as td
     >>> nice_repr(td(days=1, hours=2, minutes=3, seconds=4))
     '1 day, 2 hours, 3 minutes, 4 seconds'
@@ -55,17 +55,17 @@ def nice_repr(timedelta, display="long", sep=", "):
     >>> nice_repr(td(seconds=0), 'long')
     '0 seconds'
     """
-    
+
     assert isinstance(timedelta, datetime.timedelta), "First argument must be a timedelta."
-    
+
     result = []
-    
+
     weeks = int(timedelta.days / 7)
     days = timedelta.days % 7
     hours = int(timedelta.seconds / 3600)
     minutes = int((timedelta.seconds % 3600) / 60)
     seconds = timedelta.seconds % 60
-    
+
     if display == "sql":
         days += weeks * 7
         return "%i %02i:%02i:%02i" % (days, hours, minutes, seconds)
@@ -88,9 +88,9 @@ def nice_repr(timedelta, display="long", sep=", "):
             'i': minutes if minutes > 9 else '0%s' % minutes,
             's': seconds if seconds > 9 else '0%s' % seconds
         }
-    
+
     values = [weeks, days, hours, minutes, seconds]
-    
+
     for i in range(len(values)):
         if values[i]:
             if values[i] == 1 and len(words[i]) > 1:
@@ -102,11 +102,11 @@ def nice_repr(timedelta, display="long", sep=", "):
     if len(result) == 0:
         # display as 0 of the smallest unit
         result.append('0%s' % (words[-1]))
-    
+
     return sep.join(result)
 
 
-def iso8601_repr(timedelta):
+def iso8601_repr(timedelta, format=None):
     """
     Represent a timedelta as an ISO8601 duration.
     http://en.wikipedia.org/wiki/ISO_8601#Durations
@@ -122,6 +122,11 @@ def iso8601_repr(timedelta):
     hours = int(timedelta.seconds / 3600)
     minutes = int((timedelta.seconds % 3600) / 60)
     seconds = timedelta.seconds % 60
+
+    if format == 'alt':
+        if years or weeks or days:
+            raise ValueError('Does not support alt format for durations > 1 day')
+        return 'PT{0:02d}:{0:02d}:{0:02d}'.format(hours, minutes, seconds)
 
     formatting = (
         ('P', (
@@ -142,13 +147,15 @@ def iso8601_repr(timedelta):
         for format, value in subcats:
             if value:
                 result.append('%d%c' % (value, format))
+    if result[-1] == 'T':
+        result = result[:-1]
 
     return "".join(result)
 
 def parse(string):
     """
     Parse a string into a timedelta object.
-    
+
     >>> parse("1 day")
     datetime.timedelta(1)
     >>> parse("2 days")
@@ -231,7 +238,7 @@ def parse(string):
     TypeError: ' hours' is not a valid time interval
     >>> parse("1 hour, 5 mins")
     datetime.timedelta(0, 3900)
-    
+
     >>> parse("-2 days")
     datetime.timedelta(-2)
     >>> parse("-1 day 0:00:01")
@@ -281,7 +288,7 @@ def parse(string):
         if not d:
             raise TypeError("'%s' is not a valid time interval" % string)
         d = d.groupdict(0)
-    
+
     return datetime.timedelta(**dict(( (k, float(v)) for k,v in d.items())))
 
 
@@ -289,7 +296,7 @@ def divide(obj1, obj2, as_float=False):
     """
     Allows for the division of timedeltas by other timedeltas, or by
     floats/Decimals
-    
+
     >>> from datetime import timedelta as td
     >>> divide(td(1), td(1))
     1
@@ -309,11 +316,11 @@ def divide(obj1, obj2, as_float=False):
     Traceback (most recent call last):
         ...
     AssertionError: as_float=True is inappropriate when dividing timedelta by a number.
-    
+
     """
     assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
     assert isinstance(obj2, (datetime.timedelta, int, float, Decimal)), "Second argument must be a timedelta or number"
-    
+
     sec1 = obj1.days * 86400 + obj1.seconds
     if isinstance(obj2, datetime.timedelta):
         sec2 = obj2.days * 86400 + obj2.seconds
@@ -332,7 +339,7 @@ def divide(obj1, obj2, as_float=False):
 def modulo(obj1, obj2):
     """
     Allows for remainder division of timedelta by timedelta or integer.
-    
+
     >>> from datetime import timedelta as td
     >>> modulo(td(5), td(2))
     datetime.timedelta(1)
@@ -340,7 +347,7 @@ def modulo(obj1, obj2):
     datetime.timedelta(0)
     >>> modulo(td(15), 4 * 3600 * 24)
     datetime.timedelta(3)
-    
+
     >>> modulo(5, td(1))
     Traceback (most recent call last):
         ...
@@ -352,14 +359,14 @@ def modulo(obj1, obj2):
     """
     assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
     assert isinstance(obj2, (datetime.timedelta, int)), "Second argument must be a timedelta or int."
-    
+
     sec1 = obj1.days * 86400 + obj1.seconds
     if isinstance(obj2, datetime.timedelta):
         sec2 = obj2.days * 86400 + obj2.seconds
         return datetime.timedelta(seconds=sec1 % sec2)
     else:
         return datetime.timedelta(seconds=(sec1 % obj2))
-    
+
 def percentage(obj1, obj2):
     """
     What percentage of obj2 is obj1? We want the answer as a float.
@@ -370,7 +377,7 @@ def percentage(obj1, obj2):
     """
     assert isinstance(obj1, datetime.timedelta), "First argument must be a timedelta."
     assert isinstance(obj2, datetime.timedelta), "Second argument must be a timedelta."
-    
+
     return divide(obj1 * 100, obj2, as_float=True)
 
 def decimal_percentage(obj1, obj2):
@@ -381,8 +388,8 @@ def decimal_percentage(obj1, obj2):
     Decimal('50.0')
     """
     return Decimal(str(percentage(obj1, obj2)))
-    
-    
+
+
 def multiply(obj, val):
     """
     Allows for the multiplication of timedeltas by float values.
@@ -403,10 +410,10 @@ def multiply(obj, val):
         ...
     AssertionError: Second argument must be a number.
     """
-    
+
     assert isinstance(obj, datetime.timedelta), "First argument must be a timedelta."
     assert isinstance(val, (int, float, Decimal)), "Second argument must be a number."
-    
+
     sec = obj.days * 86400 + obj.seconds
     sec *= val
     if isinstance(sec, Decimal):
@@ -417,9 +424,9 @@ def multiply(obj, val):
 def round_to_nearest(obj, timedelta):
     """
     The obj is rounded to the nearest whole number of timedeltas.
-    
+
     obj can be a timedelta, datetime or time object.
-    
+
     >>> round_to_nearest(datetime.datetime(2012, 1, 1, 9, 43), datetime.timedelta(1))
     datetime.datetime(2012, 1, 1, 0, 0)
     >>> round_to_nearest(datetime.datetime(2012, 1, 1, 9, 43), datetime.timedelta(hours=1))
@@ -428,7 +435,7 @@ def round_to_nearest(obj, timedelta):
     datetime.datetime(2012, 1, 1, 9, 45)
     >>> round_to_nearest(datetime.datetime(2012, 1, 1, 9, 43), datetime.timedelta(minutes=1))
     datetime.datetime(2012, 1, 1, 9, 43)
-    
+
     >>> td = datetime.timedelta(minutes=30)
     >>> round_to_nearest(datetime.timedelta(minutes=0), td)
     datetime.timedelta(0)
@@ -471,13 +478,13 @@ def round_to_nearest(obj, timedelta):
 
     >>> round_to_nearest(datetime.time(0,20), td)
     datetime.time(0, 30)
-    
+
     TODO: test with tzinfo (non-naive) datetimes/times.
     """
-    
+
     assert isinstance(obj, (datetime.datetime, datetime.timedelta, datetime.time)), "First argument must be datetime, time or timedelta."
     assert isinstance(timedelta, datetime.timedelta), "Second argument must be a timedelta."
-    
+
     time_only = False
     if isinstance(obj, datetime.timedelta):
         counter = datetime.timedelta(0)
@@ -487,20 +494,20 @@ def round_to_nearest(obj, timedelta):
         counter = datetime.datetime.combine(datetime.date.today(), datetime.time(0, tzinfo=obj.tzinfo))
         obj = datetime.datetime.combine(datetime.date.today(), obj)
         time_only = True
-    
+
     diff = abs(obj - counter)
     while counter < obj:
         old_diff = diff
         counter += timedelta
         diff = abs(obj - counter)
-    
+
     if counter == obj:
         result = obj
     elif diff <= old_diff:
         result = counter
     else:
         result = counter - timedelta
-    
+
     if time_only:
         return result.time()
     else:
@@ -519,7 +526,7 @@ def decimal_hours(timedelta, decimal_places=None):
 def week_containing(date):
     if date.weekday():
         date -= datetime.timedelta(date.weekday())
-    
+
     return date, date + datetime.timedelta(6)
 
 try:
