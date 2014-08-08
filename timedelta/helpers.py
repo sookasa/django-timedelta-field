@@ -266,6 +266,8 @@ def parse(string):
     >>> parse(nice_repr(zero, 'short'))
     datetime.timedelta(0)
     """
+    string = string.strip()
+
     if string == "":
         raise TypeError("'%s' is not a valid time interval" % string)
     # This is the format we get from sometimes Postgres, sqlite,
