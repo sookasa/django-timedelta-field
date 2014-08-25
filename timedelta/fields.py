@@ -86,10 +86,9 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
         return COLUMN_TYPES[connection.settings_dict['ENGINE']]
 
     def deconstruct(self):
-        return (
-            self.name, 'timedelta.fields.TimedeltaField',
-            (), {
-                'min_value': self._min_value, 
-                'max_value': self._max_value
-            }
-        )
+        name, path, args, kwargs = super(TimedeltaField, self).deconstruct()
+        if self._min_value is not None:
+            kwargs['min_value'] = self._min_value
+        if self._max_value is not None:
+            kwargs['max_value'] = self._max_value
+        return name, path, args, kwargs
