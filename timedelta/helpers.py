@@ -238,7 +238,7 @@ def parse(string):
     >>> parse(" hours")
     Traceback (most recent call last):
         ...
-    TypeError: ' hours' is not a valid time interval
+    TypeError: 'hours' is not a valid time interval
     >>> parse("1 hour, 5 mins")
     datetime.timedelta(0, 3900)
 
@@ -265,6 +265,8 @@ def parse(string):
     datetime.timedelta(0)
     >>> parse(nice_repr(zero, 'short'))
     datetime.timedelta(0)
+    >>> parse('  50 days 00:00:00   ')
+    datetime.timedelta(50)
     """
     string = string.strip()
 
