@@ -10,11 +10,6 @@ from .forms import TimedeltaFormField
 
 # TODO: Figure out why django admin thinks fields of this type have changed every time an object is saved.
 
-# Define the different column types that different databases can use.
-COLUMN_TYPES = defaultdict(lambda:"char(20)")
-COLUMN_TYPES["django.db.backends.postgresql_psycopg2"] = "interval"
-COLUMN_TYPES["django.contrib.gis.db.backends.postgis"] = "interval"
-
 class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """
     Store a datetime.timedelta as an INTERVAL in postgres, or a 
@@ -83,7 +78,7 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
         return ""
         
     def db_type(self, connection):
-        return COLUMN_TYPES[connection.settings_dict['ENGINE']]
+        return 'interval'
 
     def deconstruct(self):
         name, path, args, kwargs = super(TimedeltaField, self).deconstruct()
