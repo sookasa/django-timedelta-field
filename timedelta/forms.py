@@ -1,6 +1,5 @@
 from django import forms
-from django.utils.translation import ugettext_lazy as _
-from django.utils import six
+from django.utils.translation import gettext_lazy as _
 
 import datetime
 from collections import defaultdict
@@ -36,7 +35,7 @@ class TimedeltaFormField(forms.Field):
         >>> try:
         ...  t.clean('3 days, 8:42:42.3.42161')
         ... except forms.ValidationError as arg:
-        ...  six.print_(arg.messages[0])
+        ...  print(arg.messages[0])
         Enter a valid time span: e.g. "3 days, 4 hours, 2 minutes"
         >>> t.clean('5 day, 8:42:42')
         datetime.timedelta(5, 31362)
@@ -77,9 +76,9 @@ class TimedeltaFormField(forms.Field):
         >>> t.clean('2 weeks, 2 days')
         datetime.timedelta(16)
         >>> try:
-        ...  t.clean(six.u('2 we\xe8k, 2 days'))
+        ...  t.clean('2 we\xe8k, 2 days')
         ... except forms.ValidationError as arg:
-        ...  six.print_(arg.messages[0])
+        ...  print(arg.messages[0])
         Enter a valid time span: e.g. "3 days, 4 hours, 2 minutes"
         """
         

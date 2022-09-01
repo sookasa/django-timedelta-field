@@ -4,8 +4,6 @@ import re
 import datetime
 from decimal import Decimal
 
-from django.utils import six
-
 STRFDATETIME = re.compile('([dgGhHis])')
 STRFDATETIME_REPL = lambda x: '%%(%s)s' % x.group()
 
@@ -276,7 +274,7 @@ def parse(string):
     # and from serialization
     d = re.match(r'^((?P<days>[-+]?\d+) days?,? )?(?P<sign>[-+]?)(?P<hours>\d+):'
                  r'(?P<minutes>\d+)(:(?P<seconds>\d+(\.\d+)?))?$',
-                 six.text_type(string))
+                 str(string))
     if d:
         d = d.groupdict(0)
         if d['sign'] == '-':
@@ -291,7 +289,7 @@ def parse(string):
                      r'((?P<hours>-?((\d*\.\d+)|\d+))\W*h(ou)?(r(s)?)?(,)?\W*)?'
                      r'((?P<minutes>-?((\d*\.\d+)|\d+))\W*m(in(ute)?(s)?)?(,)?\W*)?'
                      r'((?P<seconds>-?((\d*\.\d+)|\d+))\W*s(ec(ond)?(s)?)?)?\W*$',
-                     six.text_type(string))
+                     str(string))
         if not d:
             raise TypeError("'%s' is not a valid time interval" % string)
         d = d.groupdict(0)
