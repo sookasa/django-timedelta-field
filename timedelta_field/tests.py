@@ -1,20 +1,13 @@
-from unittest import TestCase
+from django.test import TestCase
 import datetime
 import doctest
 
 from django.core.exceptions import ValidationError
-from django.db import models
-from django.utils import six
 
-from .fields import TimedeltaField
-import timedelta.helpers
-import timedelta.forms
-import timedelta.widgets
-
-class MinMaxTestModel(models.Model):
-    min = TimedeltaField(min_value=datetime.timedelta(1))
-    max = TimedeltaField(max_value=datetime.timedelta(1))
-    minmax = TimedeltaField(min_value=datetime.timedelta(1), max_value=datetime.timedelta(7))
+import timedelta_field.helpers
+import timedelta_field.forms
+import timedelta_field.widgets
+from test_app.models import MinMaxTestModel
     
 class TimedeltaModelFieldTest(TestCase):
     def test_validate(self):
@@ -55,7 +48,20 @@ class TimedeltaModelFieldTest(TestCase):
         self.assertEquals(datetime.timedelta(0, 120), obj.max)
         self.assertEquals(datetime.timedelta(3), obj.minmax)
 
+        obj.min = datetime.timedelta(hours=23)
+        obj.save()
+        obj.refresh_from_db()
+        self.assertEquals(datetime.timedelta(hours=23), obj.min)
+
+        obj.min = '25 days'
+        obj.save()
+        obj.refresh_from_db()
+        self.assertEquals(datetime.timedelta(days=25), obj.min)
+
+    def tearDown(self):
+        MinMaxTestModel.objects.all().delete()
+
 def load_tests(loader, tests, ignore):
-    tests.addTests(doctest.DocTestSuite(timedelta.helpers))
-    tests.addTests(doctest.DocTestSuite(timedelta.forms))
+    tests.addTests(doctest.DocTestSuite(timedelta_field.helpers))
+    tests.addTests(doctest.DocTestSuite(timedelta_field.forms))
     return tests

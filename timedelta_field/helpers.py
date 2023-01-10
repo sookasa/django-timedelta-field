@@ -4,8 +4,6 @@ import re
 import datetime
 from decimal import Decimal
 
-from django.utils import six
-
 STRFDATETIME = re.compile('([dgGhHis])')
 STRFDATETIME_REPL = lambda x: '%%(%s)s' % x.group()
 
@@ -160,49 +158,49 @@ def parse(string):
     Parse a string into a timedelta object.
 
     >>> parse("1 day")
-    datetime.timedelta(1)
+    datetime.timedelta(days=1)
     >>> parse("2 days")
-    datetime.timedelta(2)
+    datetime.timedelta(days=2)
     >>> parse("1 d")
-    datetime.timedelta(1)
+    datetime.timedelta(days=1)
     >>> parse("1 hour")
-    datetime.timedelta(0, 3600)
+    datetime.timedelta(seconds=3600)
     >>> parse("1 hours")
-    datetime.timedelta(0, 3600)
+    datetime.timedelta(seconds=3600)
     >>> parse("1 hr")
-    datetime.timedelta(0, 3600)
+    datetime.timedelta(seconds=3600)
     >>> parse("1 hrs")
-    datetime.timedelta(0, 3600)
+    datetime.timedelta(seconds=3600)
     >>> parse("1h")
-    datetime.timedelta(0, 3600)
+    datetime.timedelta(seconds=3600)
     >>> parse("1wk")
-    datetime.timedelta(7)
+    datetime.timedelta(days=7)
     >>> parse("1 week")
-    datetime.timedelta(7)
+    datetime.timedelta(days=7)
     >>> parse("1 weeks")
-    datetime.timedelta(7)
+    datetime.timedelta(days=7)
     >>> parse("2 wks")
-    datetime.timedelta(14)
+    datetime.timedelta(days=14)
     >>> parse("1 sec")
-    datetime.timedelta(0, 1)
+    datetime.timedelta(seconds=1)
     >>> parse("1 secs")
-    datetime.timedelta(0, 1)
+    datetime.timedelta(seconds=1)
     >>> parse("1 s")
-    datetime.timedelta(0, 1)
+    datetime.timedelta(seconds=1)
     >>> parse("1 second")
-    datetime.timedelta(0, 1)
+    datetime.timedelta(seconds=1)
     >>> parse("1 seconds")
-    datetime.timedelta(0, 1)
+    datetime.timedelta(seconds=1)
     >>> parse("1 minute")
-    datetime.timedelta(0, 60)
+    datetime.timedelta(seconds=60)
     >>> parse("1 min")
-    datetime.timedelta(0, 60)
+    datetime.timedelta(seconds=60)
     >>> parse("1 m")
-    datetime.timedelta(0, 60)
+    datetime.timedelta(seconds=60)
     >>> parse("1 minutes")
-    datetime.timedelta(0, 60)
+    datetime.timedelta(seconds=60)
     >>> parse("1 mins")
-    datetime.timedelta(0, 60)
+    datetime.timedelta(seconds=60)
     >>> parse("2 ws")
     Traceback (most recent call last):
     ...
@@ -228,28 +226,28 @@ def parse(string):
     ...
     TypeError: '' is not a valid time interval
     >>> parse("1.5 days")
-    datetime.timedelta(1, 43200)
+    datetime.timedelta(days=1, seconds=43200)
     >>> parse("3 weeks")
-    datetime.timedelta(21)
+    datetime.timedelta(days=21)
     >>> parse("4.2 hours")
-    datetime.timedelta(0, 15120)
+    datetime.timedelta(seconds=15120)
     >>> parse(".5 hours")
-    datetime.timedelta(0, 1800)
+    datetime.timedelta(seconds=1800)
     >>> parse(" hours")
     Traceback (most recent call last):
         ...
     TypeError: 'hours' is not a valid time interval
     >>> parse("1 hour, 5 mins")
-    datetime.timedelta(0, 3900)
+    datetime.timedelta(seconds=3900)
 
     >>> parse("-2 days")
-    datetime.timedelta(-2)
+    datetime.timedelta(days=-2)
     >>> parse("-1 day 0:00:01")
-    datetime.timedelta(-1, 1)
+    datetime.timedelta(days=-1, seconds=1)
     >>> parse("-1 day, -1:01:01")
-    datetime.timedelta(-2, 82739)
+    datetime.timedelta(days=-2, seconds=82739)
     >>> parse("-1 weeks, 2 days, -3 hours, 4 minutes, -5 seconds")
-    datetime.timedelta(-5, 11045)
+    datetime.timedelta(days=-5, seconds=11045)
 
     >>> parse("0 seconds")
     datetime.timedelta(0)
@@ -266,7 +264,7 @@ def parse(string):
     >>> parse(nice_repr(zero, 'short'))
     datetime.timedelta(0)
     >>> parse('  50 days 00:00:00   ')
-    datetime.timedelta(50)
+    datetime.timedelta(days=50)
     """
     string = string.strip()
 
@@ -276,7 +274,7 @@ def parse(string):
     # and from serialization
     d = re.match(r'^((?P<days>[-+]?\d+) days?,? )?(?P<sign>[-+]?)(?P<hours>\d+):'
                  r'(?P<minutes>\d+)(:(?P<seconds>\d+(\.\d+)?))?$',
-                 six.text_type(string))
+                 str(string))
     if d:
         d = d.groupdict(0)
         if d['sign'] == '-':
@@ -291,7 +289,7 @@ def parse(string):
                      r'((?P<hours>-?((\d*\.\d+)|\d+))\W*h(ou)?(r(s)?)?(,)?\W*)?'
                      r'((?P<minutes>-?((\d*\.\d+)|\d+))\W*m(in(ute)?(s)?)?(,)?\W*)?'
                      r'((?P<seconds>-?((\d*\.\d+)|\d+))\W*s(ec(ond)?(s)?)?)?\W*$',
-                     six.text_type(string))
+                     str(string))
         if not d:
             raise TypeError("'%s' is not a valid time interval" % string)
         d = d.groupdict(0)
@@ -310,7 +308,7 @@ def divide(obj1, obj2, as_float=False):
     >>> divide(td(2), td(1))
     2
     >>> divide(td(32), 16)
-    datetime.timedelta(2)
+    datetime.timedelta(days=2)
     >>> divide(datetime.timedelta(1), datetime.timedelta(hours=6))
     4
     >>> divide(datetime.timedelta(2), datetime.timedelta(3))
@@ -318,7 +316,7 @@ def divide(obj1, obj2, as_float=False):
     >>> divide(datetime.timedelta(8), datetime.timedelta(3), as_float=True)
     2.6666666666666665
     >>> divide(datetime.timedelta(8), 2.0)
-    datetime.timedelta(4)
+    datetime.timedelta(days=4)
     >>> divide(datetime.timedelta(8), 2, as_float=True)
     Traceback (most recent call last):
         ...
@@ -349,11 +347,11 @@ def modulo(obj1, obj2):
 
     >>> from datetime import timedelta as td
     >>> modulo(td(5), td(2))
-    datetime.timedelta(1)
+    datetime.timedelta(days=1)
     >>> modulo(td(6), td(3))
     datetime.timedelta(0)
     >>> modulo(td(15), 4 * 3600 * 24)
-    datetime.timedelta(3)
+    datetime.timedelta(days=3)
 
     >>> modulo(5, td(1))
     Traceback (most recent call last):
@@ -401,13 +399,13 @@ def multiply(obj, val):
     """
     Allows for the multiplication of timedeltas by float values.
     >>> multiply(datetime.timedelta(seconds=20), 1.5)
-    datetime.timedelta(0, 30)
+    datetime.timedelta(seconds=30)
     >>> multiply(datetime.timedelta(1), 2.5)
-    datetime.timedelta(2, 43200)
+    datetime.timedelta(days=2, seconds=43200)
     >>> multiply(datetime.timedelta(1), 3)
-    datetime.timedelta(3)
+    datetime.timedelta(days=3)
     >>> multiply(datetime.timedelta(1), Decimal("5.5"))
-    datetime.timedelta(5, 43200)
+    datetime.timedelta(days=5, seconds=43200)
     >>> multiply(datetime.date.today(), 2.5)
     Traceback (most recent call last):
         ...
@@ -449,31 +447,31 @@ def round_to_nearest(obj, timedelta):
     >>> round_to_nearest(datetime.timedelta(minutes=14), td)
     datetime.timedelta(0)
     >>> round_to_nearest(datetime.timedelta(minutes=15), td)
-    datetime.timedelta(0, 1800)
+    datetime.timedelta(seconds=1800)
     >>> round_to_nearest(datetime.timedelta(minutes=29), td)
-    datetime.timedelta(0, 1800)
+    datetime.timedelta(seconds=1800)
     >>> round_to_nearest(datetime.timedelta(minutes=30), td)
-    datetime.timedelta(0, 1800)
+    datetime.timedelta(seconds=1800)
     >>> round_to_nearest(datetime.timedelta(minutes=42), td)
-    datetime.timedelta(0, 1800)
+    datetime.timedelta(seconds=1800)
     >>> round_to_nearest(datetime.timedelta(hours=7, minutes=22), td)
-    datetime.timedelta(0, 27000)
+    datetime.timedelta(seconds=27000)
 
     >>> td = datetime.timedelta(minutes=15)
     >>> round_to_nearest(datetime.timedelta(minutes=0), td)
     datetime.timedelta(0)
     >>> round_to_nearest(datetime.timedelta(minutes=14), td)
-    datetime.timedelta(0, 900)
+    datetime.timedelta(seconds=900)
     >>> round_to_nearest(datetime.timedelta(minutes=15), td)
-    datetime.timedelta(0, 900)
+    datetime.timedelta(seconds=900)
     >>> round_to_nearest(datetime.timedelta(minutes=29), td)
-    datetime.timedelta(0, 1800)
+    datetime.timedelta(seconds=1800)
     >>> round_to_nearest(datetime.timedelta(minutes=30), td)
-    datetime.timedelta(0, 1800)
+    datetime.timedelta(seconds=1800)
     >>> round_to_nearest(datetime.timedelta(minutes=42), td)
-    datetime.timedelta(0, 2700)
+    datetime.timedelta(seconds=2700)
     >>> round_to_nearest(datetime.timedelta(hours=7, minutes=22), td)
-    datetime.timedelta(0, 26100)
+    datetime.timedelta(seconds=26100)
 
     >>> td = datetime.timedelta(minutes=30)
     >>> round_to_nearest(datetime.datetime(2010,1,1,9,22), td)

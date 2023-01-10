@@ -1,0 +1,11 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*~
+
+
+db.sqlite3
+.tox
+
+django_timedeltafield.egg-info/

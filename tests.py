@@ -12,7 +12,7 @@ def main(db_engine='sqlite3'):
     You can play with a django model without a complete django app installation.
     http://www.djangosnippets.org/snippets/1044/
     """
-    os.environ["DJANGO_SETTINGS_MODULE"] = "django.conf.global_settings"
+    os.environ["DJANGO_SETTINGS_MODULE"] = "test_app.settings"
     from django.conf import global_settings
 
     global_settings.INSTALLED_APPS = (

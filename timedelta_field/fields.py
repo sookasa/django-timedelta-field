@@ -1,6 +1,5 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.utils import six
 
 from collections import defaultdict
 import datetime
@@ -10,7 +9,7 @@ from .forms import TimedeltaFormField
 
 # TODO: Figure out why django admin thinks fields of this type have changed every time an object is saved.
 
-class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
+class TimedeltaField(models.Field):
     """
     Store a datetime.timedelta as an INTERVAL in postgres, or a 
     CHAR(20) in other database backends.
@@ -39,7 +38,7 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
     def get_prep_value(self, value):
         if self.null and value == "":
             return None
-        if (value is None) or isinstance(value, six.string_types):
+        if (value is None) or isinstance(value, str):
             return value
         return str(value).replace(',', '')
         
@@ -87,3 +86,26 @@ class TimedeltaField(six.with_metaclass(models.SubfieldBase, models.Field)):
         if self._max_value is not None:
             kwargs['max_value'] = self._max_value
         return name, path, args, kwargs
+
+    def contribute_to_class(self, cls, name):
+        super(TimedeltaField, self).contribute_to_class(cls, name)
+        setattr(cls, name, CastOnAssignDescriptor(self))
+
+
+class CastOnAssignDescriptor(object):
+    """
+    A property descriptor which ensures that `field.to_python()` is called on _every_ assignment to the field.
+    This used to be provided by the `django.db.models.subclassing.Creator` class, which in turn
+    was used by the deprecated-in-Django-1.10 `SubfieldBase` class, hence the reimplementation here.
+    """
+
+    def __init__(self, field):
+        self.field = field
+
+    def __get__(self, obj, type=None):
+        if obj is None:
+            return self
+        return obj.__dict__[self.field.name]
+
+    def __set__(self, obj, value):
+        obj.__dict__[self.field.name] = self.field.to_python(value)
