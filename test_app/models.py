@@ -1,6 +1,6 @@
 
 from django.db import models
-from timedelta.fields import TimedeltaField
+from timedelta_field.fields import TimedeltaField
 import datetime
 
 

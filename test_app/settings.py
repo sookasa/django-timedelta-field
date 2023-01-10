@@ -57,7 +57,7 @@ INSTALLED_APPS = (
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "timedelta",
+    "timedelta_field",
     "test_app",
 )
 

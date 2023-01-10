@@ -2,7 +2,7 @@
 
 import datetime
 from django.db import migrations, models
-import timedelta.fields
+import timedelta_field.fields
 
 
 class Migration(migrations.Migration):
@@ -26,19 +26,19 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "min",
-                    timedelta.fields.TimedeltaField(
+                    timedelta_field.fields.TimedeltaField(
                         min_value=datetime.timedelta(days=1)
                     ),
                 ),
                 (
                     "max",
-                    timedelta.fields.TimedeltaField(
+                    timedelta_field.fields.TimedeltaField(
                         max_value=datetime.timedelta(days=1)
                     ),
                 ),
                 (
                     "minmax",
-                    timedelta.fields.TimedeltaField(
+                    timedelta_field.fields.TimedeltaField(
                         max_value=datetime.timedelta(days=7),
                         min_value=datetime.timedelta(days=1),
                     ),
